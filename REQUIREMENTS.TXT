@@ -1,0 +1,6 @@
+Django>=1.4
+South>=0.8.2
+sorl-thumbnail>=11.12
+django-model-utils>=1.5.0
+pytz
+Pillow>=2.2.1
