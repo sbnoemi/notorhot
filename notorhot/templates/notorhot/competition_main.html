@@ -1,0 +1,20 @@
+	<h1>{{ competition.left.name }} vs. {{ competition.right.name }}</h1>
+	
+	{% include 'notorhot/new_comparison.html' %}
+	
+	<div id="competition">
+		<div class="left">
+			{% with candidate=competition.left %}
+				{% include 'notorhot/competition_candidate.html' %}
+			{% endwith %}
+		</div><!-- /left -->
+		
+		<span>vs.</span>
+		
+		<div class="right">
+			{% with candidate=competition.right %}
+				{% include 'notorhot/competition_candidate.html' %}
+			{% endwith %}
+		</div><!-- /right -->
+	</div><!-- /competition -->
+
