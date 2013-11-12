@@ -49,6 +49,8 @@ class Candidate(models.Model):
     slug = AutoSlugField(populate_from='name', unique=True, blank=True)
     pic = ImageField(upload_to='candidates')
     is_enabled = models.BooleanField(default=True)
+    
+    category = models.ForeignKey(CandidateCategory, related_name='candidates')
 
     # These fields technically violate 3rd normal form, but are a lot less
     # expensive to update than to calculate.
@@ -127,11 +129,15 @@ class Competition(models.Model):
         help_text=_l(u"Candidate to present on the left-hand side of the comparison"))
     right = models.ForeignKey(Candidate, related_name='comparisons_right', 
         help_text=_l(u"Candidate to present on the right-hand side of the comparison"))
+
+    # denormalized for easier filtering
+    category = models.ForeignKey(CandidateCategory, related_name='competitions')
         
     winner = models.ForeignKey(Candidate, related_name='comparisons_won', 
         null=True, blank=True,
         help_text=_l(u"Candidate who won the competition"))
     
+    # denormalized for easier reporting
     winning_side = models.PositiveSmallIntegerField(null=True, blank=True, 
         choices=SIDES)
         
@@ -150,6 +156,9 @@ class Competition(models.Model):
         if not self.id:
             self.left.increment_challenges()
             self.right.increment_challenges()
+            
+        if not self.category:
+            self.category = self.left.category
             
         super(Competition, self).save(*args, **kwargs)
             
