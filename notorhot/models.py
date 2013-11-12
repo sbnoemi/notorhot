@@ -18,7 +18,9 @@ class Candidate(models.Model):
     name = models.CharField(max_length=100)
     pic = ImageField(upload_to='candidates')
     is_enabled = models.BooleanField(default=True)
-    
+
+    # These fields technically violate 3rd normal form, but are a lot less
+    # expensive to update than to calculate.
     challenges = models.PositiveIntegerField(default=0, blank=True, 
         help_text=_l(u"Number of times this candidate has been presented to users"))
     votes = models.PositiveIntegerField(default=0, blank=True, 
@@ -34,6 +36,20 @@ class Candidate(models.Model):
 
     def __unicode__(self):
         return self.name
+        
+    def increment_challenges(self):
+        self.challenges += 1
+        self.save()
+        
+    def increment_votes(self, won):
+        self.votes += 1
+        if won:
+            self.wins += 1
+        self.save()
+        
+    @property
+    def win_percentage(self):
+        return 100 * float(self.wins)/float(self.votes)
     
     
 class CompetitionManager(models.Manager):
@@ -96,6 +112,14 @@ class Competition(models.Model):
             raise ValidationError(_(u"Winner must be one of the candidates "
                 u"offered on left or right."))
                 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.left.increment_challenges()
+            self.right.increment_challenges()
+            
+        super(Competition, self).save(*args, **kwargs)
+            
+                
     def record_vote(self, winner):
         self.winning_side = winner
         
@@ -103,6 +127,9 @@ class Competition(models.Model):
             self.winner = self.left
         elif winner == self.SIDES.RIGHT:
             self.winner = self.right
+            
+        self.left.increment_votes((winner == self.SIDES.LEFT))
+        self.right.increment_votes((winner == self.SIDES.RIGHT))
             
         self.date_voted = datetime.datetime.now()
         
