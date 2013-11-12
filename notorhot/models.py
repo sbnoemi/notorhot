@@ -4,11 +4,21 @@ from django.core.exceptions import ValidationError
 
 from sorl.thumbnail import ImageField
 from model_utils import Choices
+from model_utils.managers import PassThroughManager
 
 import datetime
 
 
-class EnabledCandidateManager(models.Manager):
+class CandidateQuerySet(models.query.QuerySet):
+    def order_by_wins(self):
+        return self.extra(select={ 'win_pct': 'wins / votes', }).order_by(
+            '-win_pct')
+
+
+CandidateManager = PassThroughManager.for_queryset_class(CandidateQuerySet)
+
+
+class EnabledCandidateManager(CandidateManager):
     def get_queryset(self):
         return super(EnabledCandidateManager, self).get_queryset().filter(
             is_enabled=True)
@@ -31,7 +41,7 @@ class Candidate(models.Model):
         
     added = models.DateTimeField(auto_now_add=True)
 
-    objects = models.Manager()
+    objects = CandidateManager()
     enabled = EnabledCandidateManager()
 
     def __unicode__(self):
