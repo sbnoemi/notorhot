@@ -2,20 +2,25 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from django.views.generic.detail import DetailView
+from django.views.generic.detail import DetailView, BaseDetailView, \
+    SingleObjectTemplateResponseMixin
 from django.views.decorators.cache import never_cache
 from django.core.urlresolvers import reverse_lazy
 
 from notorhot.models import Competition, Candidate, CandidateCategory
 from notorhot.forms import VoteForm
-from notorhot.utils import NeverCacheMixin, WorkingSingleObjectMixin
+from notorhot.utils import NeverCacheMixin, WorkingSingleObjectMixin, \
+    CategoryMixin
 
 
-class CompetitionView(NeverCacheMixin, WorkingSingleObjectMixin, TemplateView):
+class CompetitionView(NeverCacheMixin, WorkingSingleObjectMixin, CategoryMixin, TemplateView):
     template_name = 'notorhot/competition.html'
     insufficient_data_template_name = 'notorhot/insufficient_data.html'
     http_method_names = ['get',]
     queryset = CandidateCategory.public.all()
+    
+    def get_category(self):
+        return self.object
     
     def get_previous_vote(self):
         previous = None
@@ -28,12 +33,15 @@ class CompetitionView(NeverCacheMixin, WorkingSingleObjectMixin, TemplateView):
                 pass
         
         return previous
+        
+    def generate_competition(self):
+        return self.object.generate_competition()
     
     def get_context_data(self, *args, **kwargs):
         context = super(CompetitionView, self).get_context_data(*args, **kwargs)
         
         try:
-            competition = Competition.objects.generate()
+            competition = self.generate_competition()
         except Candidate.DoesNotExist:
             # Not enough data.  Try again later.
             self.template_name = self.insufficient_data_template_name
@@ -52,7 +60,6 @@ class VoteView(NeverCacheMixin, WorkingSingleObjectMixin, FormView):
     http_method_names = ['post',]
     form_class = VoteForm
     queryset = Competition.votable.all()
-    success_url = reverse_lazy('notorhot_competition')
         
     def form_valid(self, form):
         form.save()
@@ -65,21 +72,31 @@ class VoteView(NeverCacheMixin, WorkingSingleObjectMixin, FormView):
         kwargs.update({'competition': self.object})
         return kwargs
         
+    def get_success_url(self):
+        return self.object.category.get_absolute_url()
+        
 
-class CandidateView(DetailView):
+class CandidateView(SingleObjectTemplateResponseMixin, CategoryMixin, BaseDetailView):
     template_name = 'notorhot/candidate.html'
     http_method_names = ['get',]    
     queryset = Candidate.enabled.all()
     context_object_name = 'candidate'
+    
+    def get_category(self):
+        return self.object.category
+        
 
-
-class LeaderboardView(TemplateView):
+class LeaderboardView(CategoryMixin, TemplateView):
     template_name = 'notorhot/leaders.html'
     http_method_names = ['get',]
     leaderboard_length = 10
     
+    def get_category(self):
+        return self._get_category()
+    
     def get_leaders(self):
-        return Candidate.enabled.order_by_wins()[:self.leaderboard_length]
+        return Candidate.enabled.for_category(self.category).order_by_wins(
+            )[:self.leaderboard_length]
     
     def get_context_data(self, *args, **kwargs):
         context = super(LeaderboardView, self).get_context_data()

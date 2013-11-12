@@ -1,4 +1,9 @@
-	<h1>{{ competition.left.name }} vs. {{ competition.right.name }}</h1>
+{% load i18n %}
+
+	<h1>{% blocktrans %}{{ category }} Competition{% endblocktrans %}</h1>
+	
+	
+	<h2>{{ competition.left.name }} vs. {{ competition.right.name }}</h2>
 	
 	{% include 'notorhot/new_competition.html' %}
 	

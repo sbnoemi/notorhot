@@ -115,7 +115,10 @@ class Candidate(models.Model):
         return 100 * float(self.wins)/float(self.votes)
         
     def get_absolute_url(self):
-        return reverse('notorhot_candidate', kwargs={ 'slug': self.slug, })
+        return reverse('notorhot_candidate', kwargs={ 
+            'slug': self.slug, 
+            'category_slug': self.category.slug,
+        })
     
 
 class CompetitionQuerySet(models.query.QuerySet):

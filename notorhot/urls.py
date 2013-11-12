@@ -4,10 +4,10 @@ from notorhot.views import CompetitionView, VoteView, LeaderboardView, \
     CandidateView, CategoryListView
 
 urlpatterns = patterns('notorhot.views',    
-    url(r'^$', CompetitionView.as_view(), name='notorhot_competition'),
     url(r'^$', CategoryListView.as_view(), name='notorhot_categories'),
+    url(r'^(?P<slug>[\w-]+)/$', CompetitionView.as_view(), name='notorhot_competition'),
     url(r'^vote/(?P<pk>\d+)/$', VoteView.as_view(), name='notorhot_vote'),
-    url(r'^candidate/(?P<slug>[\w-]+)/$', CandidateView.as_view(), 
+    url(r'^candidate/(?P<category_slug>[\w-]+)/(?P<slug>[\w-]+)/$', CandidateView.as_view(), 
         name='notorhot_candidate'),
-    url(r'^leaders/$', LeaderboardView.as_view(), name='notorhot_leaders'),
+    url(r'^(?P<category_slug>[\w-]+)/leaders/$', LeaderboardView.as_view(), name='notorhot_leaders'),
 )
