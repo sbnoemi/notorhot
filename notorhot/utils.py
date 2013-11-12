@@ -11,20 +11,3 @@ class NeverCacheMixin(object):
     def dispatch(self, *args, **kwargs):
         return super(NeverCacheMixin, self).dispatch(*args, **kwargs)
         
-        
-class ExecutableQuerysetMixin(object):
-    def get_object(self, queryset=None):
-        # Basically, we want to be able to specify a queryset to be 
-        # executed at runtime instead of loadtime, using a custom 
-        # manager instead of just defining the object we operate on.
-        
-        if queryset is None:
-            qse = getattr(self, 'queryset_executable', None)
-            if qse:
-                return super(ExecutableQuerysetMixin, self).get_object(
-                    queryset=qse())
-            else:
-                return super(ExecutableQuerysetMixin, self).get_object()
-        else:
-            return super(ExecutableQuerysetMixin, self).get_object(
-                queryset=queryset)
