@@ -34,7 +34,7 @@ class CompetitionView(NeverCacheMixin, TemplateView):
         try:
             competition = Competition.objects.generate()
         except Candidate.DoesNotExist:
-            # Not enough data.  Try again later
+            # Not enough data.  Try again later.
             self.template_name = self.insufficient_data_template_name
             return context
         
@@ -44,7 +44,8 @@ class CompetitionView(NeverCacheMixin, TemplateView):
         })        
         return context
 
-
+# This might be simpler as an UpdateView, except that the form isn't a ModelForm.
+# Oh well.
 class VoteView(NeverCacheMixin, ExecutableQuerysetMixin, SingleObjectMixin, 
         FormView):
     template_name = 'notorhot/already_voted.html'
@@ -54,11 +55,13 @@ class VoteView(NeverCacheMixin, ExecutableQuerysetMixin, SingleObjectMixin,
     success_url = reverse_lazy('notorhot_competition')
     
     def dispatch(self, *args, **kwargs):
+        # SingleObjectMixin requires but doesn't provide this.  WTF?
         self.object = self.get_object()
         return super(VoteView, self).dispatch(*args, **kwargs)
         
     def form_valid(self, form):
         form.save()
+        # save in session for display on next competition
         self.request.session['last_vote_pk'] = self.object.pk
         return super(VoteView, self).form_valid(form)
     
