@@ -1,10 +1,9 @@
-* Voting
-* Prevent re-voting
-* Leaderboard
-* Split by category (male or female; dogs or cats)
 * Add and display metadata
-* Candidate detail view
-* Compare on multiple factors (hotness; resemblance to Edward Scissorhands)
-* Refactor to be reusable
+   * Detail view
+   * Competition
+   * Leaderboard
 * User-suggested options
 * Expire competitions after a certain date
+* Refactor views to declare model on class so can override with proxies / subclasses easily.  Esp. important for get_absolute_url overrides.
+* Unit Tests
+* Compare on multiple factors (hotness; resemblance to Edward Scissorhands)
