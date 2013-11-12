@@ -50,6 +50,5 @@ class VoteView(NeverCacheMixin, ExecutableQuerysetMixin, SingleObjectMixin,
     
     def get_form_kwargs(self):        
         kwargs = super(VoteView, self).get_form_kwargs()
-        competition = self.get_object()
-        kwargs.update({'competition': competition})
+        kwargs.update({'competition': self.object})
         return kwargs
