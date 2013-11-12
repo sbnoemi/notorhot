@@ -28,8 +28,8 @@ class CompetitionView(NeverCacheMixin, TemplateView):
         
         return previous
     
-    def get_context_data(self):
-        context = super(CompetitionView, self).get_context_data()
+    def get_context_data(self, *args, **kwargs):
+        context = super(CompetitionView, self).get_context_data(*args, **kwargs)
         
         try:
             competition = Competition.objects.generate()
