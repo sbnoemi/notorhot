@@ -16,6 +16,18 @@ class CompetitionView(NeverCacheMixin, TemplateView):
     insufficient_data_template_name = 'notorhot/insufficient_data.html'
     http_method_names = ['get',]
     
+    def get_previous_vote(self):
+        previous = None
+        previous_pk = self.request.session.get('last_vote_pk')
+        
+        if previous_pk is not None:
+            try:
+                previous = Competition.objects.get(pk=previous_pk)
+            except Competition.DoesNotExist:
+                pass
+        
+        return previous
+    
     def get_context_data(self):
         context = super(CompetitionView, self).get_context_data()
         
@@ -28,6 +40,7 @@ class CompetitionView(NeverCacheMixin, TemplateView):
         
         context.update({
             'competition': competition,
+            'previous_vote': self.get_previous_vote(),
         })        
         return context
 
@@ -46,6 +59,7 @@ class VoteView(NeverCacheMixin, ExecutableQuerysetMixin, SingleObjectMixin,
         
     def form_valid(self, form):
         form.save()
+        self.request.session['last_vote_pk'] = self.object.pk
         return super(VoteView, self).form_valid(form)
     
     def get_form_kwargs(self):        
