@@ -3,8 +3,6 @@ from django.utils.translation import ugettext as _
 
 from notorhot.models import Competition, Candidate
 
-import datetime
-
 
 class VoteForm(forms.Form):
     winner = forms.TypedChoiceField(widget=forms.HiddenInput, 
@@ -23,14 +21,4 @@ class VoteForm(forms.Form):
 
     def save(self):
         winner = self.cleaned_data['winner']
-        
-        self.competition.winning_side = winner
-        
-        if winner == Competition.SIDES.LEFT:
-            self.competition.winner = self.competition.left
-        elif winner == Competition.SIDES.RIGHT:
-            self.competition.winner = self.competition.right
-            
-        self.competition.date_voted = datetime.datetime.now()
-        
-        self.competition.save()
+        self.competition.record_vote(winner)

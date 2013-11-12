@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 from sorl.thumbnail import ImageField
 from model_utils import Choices
 
+import datetime
+
 
 class EnabledCandidateManager(models.Manager):
     def get_queryset(self):
@@ -93,3 +95,16 @@ class Competition(models.Model):
         if self.winner and self.winner.id not in (self.left.id, self.right.id):
             raise ValidationError(_(u"Winner must be one of the candidates "
                 u"offered on left or right."))
+                
+    def record_vote(self, winner):
+        self.winning_side = winner
+        
+        if winner == self.SIDES.LEFT:
+            self.winner = self.left
+        elif winner == self.SIDES.RIGHT:
+            self.winner = self.right
+            
+        self.date_voted = datetime.datetime.now()
+        
+        self.save()
+        
