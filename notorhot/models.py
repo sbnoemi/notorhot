@@ -20,7 +20,9 @@ class PublicCategoryManager(models.Manager):
 class CandidateCategory(models.Model):
     name = models.CharField(max_length=50)
     slug = AutoSlugField(populate_from='name', unique=True, blank=True)
-    is_public = models.BooleanField(default=True)
+    is_public = models.BooleanField(default=True, help_text=_l(u"If false, "
+        u"this category will not be listed, and competitions for this category "
+        u"will not be available."))
     
     objects = models.Manager()
     public = PublicCategoryManager()
@@ -28,6 +30,16 @@ class CandidateCategory(models.Model):
     def __unicode__(self):
         return self.name
 
+    @property
+    def num_candidates(self):
+        return self.candidates.enabled().count()
+        
+    def num_voted_competitions(self):
+        return self.competitions.votable().count()
+    num_voted_competitions = property(num_voted_competitions, doc="Competitions voted in")    
+    #num_voted_competitions.short_description = 'Competitions Voted In'
+    
+    
 
 class CandidateQuerySet(models.query.QuerySet):
     def order_by_wins(self):
@@ -82,6 +94,9 @@ class Candidate(models.Model):
         
     @property
     def win_percentage(self):
+        if self.votes == 0:
+            return 'No votes'
+            
         return 100 * float(self.wins)/float(self.votes)
         
     def get_absolute_url(self):
