@@ -6,7 +6,7 @@ from django.views.generic.detail import SingleObjectMixin, DetailView
 from django.views.decorators.cache import never_cache
 from django.core.urlresolvers import reverse_lazy
 
-from notorhot.models import Competition, Candidate
+from notorhot.models import Competition, Candidate, CandidateCategory
 from notorhot.forms import VoteForm
 from notorhot.utils import NeverCacheMixin
 
@@ -94,3 +94,19 @@ class LeaderboardView(TemplateView):
         
         return context
     
+    
+class CategoryListView(TemplateView):
+    template_name = 'notorhot/categories.html'
+    http_method_names = ['get',]
+    
+    def get_categories(self):
+        return CandidateCategory.public.all()
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(CategoryListView, self).get_context_data()
+        
+        context.update({
+            'categories': self.get_categories()
+        })
+        
+        return context

@@ -30,6 +30,9 @@ class CandidateCategory(models.Model):
     def __unicode__(self):
         return self.name
         
+    def get_absolute_url(self):
+        return reverse('notorhot_competition', kwargs={ 'slug': self.slug, })
+        
     def generate_competition(self):
         return Competition.objects.generate_from_queryset(
             self.candidates.enabled())
@@ -42,6 +45,9 @@ class CandidateCategory(models.Model):
         return self.competitions.votable().count()
     num_voted_competitions = property(num_voted_competitions, doc="Competitions voted in")    
     #num_voted_competitions.short_description = 'Competitions Voted In'
+    
+    class Meta:
+        ordering = ('name',)
     
     
 

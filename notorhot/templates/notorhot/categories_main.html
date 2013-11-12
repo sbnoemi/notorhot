@@ -1,0 +1,17 @@
+{% load i18n %}
+
+	<h1>{% trans "Categories" %}</h1>
+	
+	{% if categories %}
+
+		<ul>
+			{% for category in categories %}
+				<li><a href="{{ category.get_absolute_url }}">{{ category }}</a></li>
+			{% endfor %}
+		</ul>
+
+	{% else %}
+
+		<p>{% trans "Sorry, we don't have any categories to vote on yet. Please try again later." %}</p>
+
+	{% endif %}
