@@ -55,6 +55,13 @@ class CompetitionManager(models.Manager):
         return self.generate_from_queryset(Candidate.enabled.all())
 
 
+class VotableCompetitionManager(models.Manager):
+    def get_queryset(self):
+        return super(VotableCompetitionManager, self).get_queryset().filter(
+            date_voted__isnull=True)
+    
+
+
 class Competition(models.Model):
     SIDES = Choices(
         (1, 'LEFT', _l(u"Left")),
@@ -76,7 +83,8 @@ class Competition(models.Model):
     winning_side = models.PositiveSmallIntegerField(null=True, blank=True, 
         choices=SIDES)
         
-    objects = CompetitionManager()    
+    objects = CompetitionManager()
+    votable = VotableCompetitionManager()
         
     def __unicode__(self):
         return "%s vs. %s" % (self.left, self.right)

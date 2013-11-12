@@ -1,9 +1,10 @@
 {% load thumbnail %}
 
 			<h2>{{ candidate.name }}</h2>
-			<form class="vote_form" method="post" action="{% url 'notorhot_vote' competition_id=competition.id %}">
+			<form class="vote_form" method="post" action="{% url 'notorhot_vote' pk=competition.id %}">
 				{% csrf_token %}
 				{% thumbnail candidate.pic "300x300" crop="center" as thumb %}
-					<input class="vote_button" type="image" src="{{ thumb.url }}" alt="{{ candidate.name }}" value="left" />
+					<input type="hidden" name="winner" value="{{ winning_side }}" />
+					<input class="vote_button" type="image" src="{{ thumb.url }}" alt="{{ candidate.name }}" />
 				{% endthumbnail %}
 			</form>

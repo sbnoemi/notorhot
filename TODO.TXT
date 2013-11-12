@@ -1,0 +1,10 @@
+* Voting
+* Prevent re-voting
+* Leaderboard
+* Split by category (male or female; dogs or cats)
+* Add and display metadata
+* Candidate detail view
+* Compare on multiple factors (hotness; resemblance to Edward Scissorhands)
+* Refactor to be reusable
+* User-suggested options
+* Expire competitions after a certain date
