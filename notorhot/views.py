@@ -69,3 +69,22 @@ class VoteView(NeverCacheMixin, ExecutableQuerysetMixin, SingleObjectMixin,
         kwargs = super(VoteView, self).get_form_kwargs()
         kwargs.update({'competition': self.object})
         return kwargs
+        
+
+class LeaderboardView(TemplateView):
+    template_name = 'notorhot/leaders.html'
+    http_method_names = ['get',]
+    leaderboard_length = 10
+    
+    def get_leaders(self):
+        return Candidate.enabled.order_by_wins()[:self.leaderboard_length]
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(LeaderboardView, self).get_context_data()
+        
+        context.update({
+            'leaders': self.get_leaders()
+        })
+        
+        return context
+    

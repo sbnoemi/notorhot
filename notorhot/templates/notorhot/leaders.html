@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+<!-- NOTE: If you dig down into how this template is composed, you'll see that 
+	we're using lots of includes.  The purpose is to make the template modular 
+	and make re-use / override of template parts easy. -->
+
+{% block body %}
+
+	{% include 'notorhot/leaders_main.html' %}
+	
+{% endblock %}

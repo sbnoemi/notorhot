@@ -1,0 +1,41 @@
+{% load i18n %}
+
+	<h1>{% trans "Leaders" %}</h1>
+	
+	{% include 'notorhot/new_competition.html' %}
+	
+	{% if leaders %}
+
+		<table class="leaderboard">
+			<thead>
+				<tr>
+					<th class="rank">{% trans "Rank" %}</th>
+					<th class="name">{% trans "Name" %}</th>
+					<th class="votes">{% trans "Votes" %}</th>
+					<th class="wins">{% trans "Wins" %}</th>
+					<th class="pct">{% trans "Win Percentage" %}</th>
+				</tr>
+			</thead>
+		
+			<tbody>
+				{% for leader in leaders %}
+					<tr>
+						<td class="rank">{{ forloop.counter }}</td>
+						<td class="name">{{ leader.name }}</td>
+						<td class="votes">{{ leader.votes }}</td>
+						<td class="wins">{{ leader.wins }}</td>
+						<td class="pct">{{ leader.win_percentage }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		
+			<tfoot>
+			</tfoot>
+		</table>
+
+	{% else %}
+
+		<p>{% trans "Sorry, we can't show any leaders until competitions have been voted on." %}</p>
+		{% include 'notorhot/new_competition.html' %}	
+
+	{% endif %}
