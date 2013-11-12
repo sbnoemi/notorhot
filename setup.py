@@ -35,5 +35,6 @@ setup(
         'sorl-thumbnail',
         'django-model-utils',
         'pillow',
+        'django-autoslug',
     ],
 )

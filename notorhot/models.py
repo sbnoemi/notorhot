@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext as _, ugettext_lazy as _l
 from django.core.exceptions import ValidationError
 
+from autoslug import AutoSlugField
 from sorl.thumbnail import ImageField
 from model_utils import Choices
 from model_utils.managers import PassThroughManager
@@ -26,6 +27,7 @@ class EnabledCandidateManager(CandidateManager):
 
 class Candidate(models.Model):
     name = models.CharField(max_length=100)
+    slug = AutoSlugField(populate_from='name', unique=True, blank=True)
     pic = ImageField(upload_to='candidates')
     is_enabled = models.BooleanField(default=True)
 
