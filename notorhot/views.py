@@ -2,19 +2,20 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from django.views.generic.detail import SingleObjectMixin, DetailView
+from django.views.generic.detail import DetailView
 from django.views.decorators.cache import never_cache
 from django.core.urlresolvers import reverse_lazy
 
 from notorhot.models import Competition, Candidate, CandidateCategory
 from notorhot.forms import VoteForm
-from notorhot.utils import NeverCacheMixin
+from notorhot.utils import NeverCacheMixin, WorkingSingleObjectMixin
 
 
-class CompetitionView(NeverCacheMixin, TemplateView):
+class CompetitionView(NeverCacheMixin, WorkingSingleObjectMixin, TemplateView):
     template_name = 'notorhot/competition.html'
     insufficient_data_template_name = 'notorhot/insufficient_data.html'
     http_method_names = ['get',]
+    queryset = CandidateCategory.public.all()
     
     def get_previous_vote(self):
         previous = None
@@ -46,17 +47,12 @@ class CompetitionView(NeverCacheMixin, TemplateView):
 
 # This might be simpler as an UpdateView, except that the form isn't a ModelForm.
 # Oh well.
-class VoteView(NeverCacheMixin, SingleObjectMixin, FormView):
+class VoteView(NeverCacheMixin, WorkingSingleObjectMixin, FormView):
     template_name = 'notorhot/already_voted.html'
     http_method_names = ['post',]
     form_class = VoteForm
     queryset = Competition.votable.all()
     success_url = reverse_lazy('notorhot_competition')
-    
-    def dispatch(self, *args, **kwargs):
-        # SingleObjectMixin requires but doesn't provide this.  WTF?
-        self.object = self.get_object()
-        return super(VoteView, self).dispatch(*args, **kwargs)
         
     def form_valid(self, form):
         form.save()
