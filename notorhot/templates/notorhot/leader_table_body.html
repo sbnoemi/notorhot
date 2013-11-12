@@ -1,7 +1,9 @@
 
 
 						<td class="rank">{{ forloop.counter }}</td>
-						<td class="name">{{ leader.name }}</td>
+						<td class="name">
+							<a href="{{ leader.get_absolute_url }}">{{ leader.name }}</a>
+						</td>
 						<td class="votes">{{ leader.votes }}</td>
 						<td class="wins">{{ leader.wins }}</td>
 						<td class="pct">{{ leader.win_percentage }}</td>

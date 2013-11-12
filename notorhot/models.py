@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext as _, ugettext_lazy as _l
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 
 from autoslug import AutoSlugField
 from sorl.thumbnail import ImageField
@@ -62,6 +63,9 @@ class Candidate(models.Model):
     @property
     def win_percentage(self):
         return 100 * float(self.wins)/float(self.votes)
+        
+    def get_absolute_url(self):
+        return reverse('notorhot_candidate', kwargs={ 'slug': self.slug, })
     
     
 class CompetitionManager(models.Manager):
