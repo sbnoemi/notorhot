@@ -11,6 +11,24 @@ from model_utils.managers import PassThroughManager
 import datetime
 
 
+class PublicCategoryManager(models.Manager):
+    def get_queryset(self):
+        return super(PublicCategoryManager, self).get_queryset().filter(
+            is_public=True)
+
+
+class CandidateCategory(models.Model):
+    name = models.CharField(max_length=50)
+    slug = AutoSlugField(populate_from='name', unique=True, blank=True)
+    is_public = models.BooleanField(default=True)
+    
+    objects = models.Manager()
+    public = PublicCategoryManager()
+    
+    def __unicode__(self):
+        return self.name
+
+
 class CandidateQuerySet(models.query.QuerySet):
     def order_by_wins(self):
         return self.extra(select={ 'win_pct': 'wins / votes', }).order_by(
