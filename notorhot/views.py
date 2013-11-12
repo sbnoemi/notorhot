@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.detail import SingleObjectMixin, DetailView
 from django.views.decorators.cache import never_cache
 from django.core.urlresolvers import reverse_lazy
 
@@ -69,6 +69,13 @@ class VoteView(NeverCacheMixin, SingleObjectMixin, FormView):
         kwargs.update({'competition': self.object})
         return kwargs
         
+
+class CandidateView(DetailView):
+    template_name = 'notorhot/candidate.html'
+    http_method_names = ['get',]    
+    queryset = Candidate.enabled.all()
+    context_object_name = 'candidate'
+
 
 class LeaderboardView(TemplateView):
     template_name = 'notorhot/leaders.html'

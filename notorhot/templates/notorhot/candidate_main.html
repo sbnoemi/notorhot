@@ -1,0 +1,12 @@
+{% load thumbnail %}
+
+	<h1>{{ candidate.name }}</h1>
+	
+	{% include 'notorhot/new_competition.html' %}
+	
+	<div id="candidate_data">		
+			{% thumbnail candidate.pic "300x600" as thumb %}
+				<img src="{{ thumb.url }}" alt="{{ candidate.name }}" />
+			{% endthumbnail %}
+	</div><!-- /competition -->
+
