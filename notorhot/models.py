@@ -29,7 +29,11 @@ class CandidateCategory(models.Model):
     
     def __unicode__(self):
         return self.name
-
+        
+    def generate_competition(self):
+        return Competition.objects.generate_from_queryset(
+            self.candidates.enabled())
+            
     @property
     def num_candidates(self):
         return self.candidates.enabled().count()
@@ -45,6 +49,12 @@ class CandidateQuerySet(models.query.QuerySet):
     def order_by_wins(self):
         return self.extra(select={ 'win_pct': 'wins / votes', }).order_by(
             '-win_pct')
+            
+    def for_category(self, category):
+        return self.filter(category=category)
+        
+    def enabled(self):
+        return self.filter(is_enabled=True)
 
 
 CandidateManager = PassThroughManager.for_queryset_class(CandidateQuerySet)
@@ -52,8 +62,7 @@ CandidateManager = PassThroughManager.for_queryset_class(CandidateQuerySet)
 
 class EnabledCandidateManager(CandidateManager):
     def get_queryset(self):
-        return super(EnabledCandidateManager, self).get_queryset().filter(
-            is_enabled=True)
+        return super(EnabledCandidateManager, self).get_queryset().enabled()
     
 
 class Candidate(models.Model):
@@ -102,8 +111,16 @@ class Candidate(models.Model):
     def get_absolute_url(self):
         return reverse('notorhot_candidate', kwargs={ 'slug': self.slug, })
     
-    
-class CompetitionManager(models.Manager):
+
+class CompetitionQuerySet(models.query.QuerySet):
+    def votable(self):
+        return self.filter(date_voted__isnull=True)
+
+
+CompetitionManager = PassThroughManager.for_queryset_class(CompetitionQuerySet)
+
+
+class CompetitionGeneratingManager(CompetitionManager):
     def generate_from_candidates(self, left, right):
         return self.create(**{
             'left': left,
@@ -124,10 +141,9 @@ class CompetitionManager(models.Manager):
         return self.generate_from_queryset(Candidate.enabled.all())
 
 
-class VotableCompetitionManager(models.Manager):
+class VotableCompetitionManager(CompetitionManager):
     def get_queryset(self):
-        return super(VotableCompetitionManager, self).get_queryset().filter(
-            date_voted__isnull=True)
+        return super(VotableCompetitionManager, self).get_queryset().votable()
     
 
 
@@ -156,7 +172,7 @@ class Competition(models.Model):
     winning_side = models.PositiveSmallIntegerField(null=True, blank=True, 
         choices=SIDES)
         
-    objects = CompetitionManager()
+    objects = CompetitionGeneratingManager()
     votable = VotableCompetitionManager()
         
     def __unicode__(self):
@@ -167,12 +183,19 @@ class Competition(models.Model):
             raise ValidationError(_(u"Winner must be one of the candidates "
                 u"offered on left or right."))
                 
+        if ((self.left.category != self.right.category) or 
+                (self.category and (self.left.category != self.category))):
+            raise ValidationError(_(u"Both candidates for competition must "
+                u"belong to same category as competition."))
+                
     def save(self, *args, **kwargs):
         if not self.id:
             self.left.increment_challenges()
             self.right.increment_challenges()
             
-        if not self.category:
+        try:
+            self.category
+        except CandidateCategory.DoesNotExist:
             self.category = self.left.category
             
         super(Competition, self).save(*args, **kwargs)
