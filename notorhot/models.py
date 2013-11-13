@@ -33,6 +33,9 @@ class CandidateCategory(models.Model):
     def get_absolute_url(self):
         return reverse('notorhot_competition', kwargs={ 'slug': self.slug, })
         
+    def get_leaderboard_url(self):
+        return reverse('notorhot_leaders', kwargs={ 'category_slug': self.slug, })
+        
     def generate_competition(self):
         return Competition.objects.generate_from_queryset(
             self.candidates.enabled())
