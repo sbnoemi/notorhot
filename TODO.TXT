@@ -1,7 +1,3 @@
-* Add and display metadata
-   * Detail view
-   * Competition
-   * Leaderboard
 * User-suggested options
 * Expire competitions after a certain date
 * Refactor views to declare model on class so can override with proxies / subclasses easily.  Esp. important for get_absolute_url overrides.
