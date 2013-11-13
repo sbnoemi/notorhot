@@ -8,7 +8,7 @@
 	{% include 'notorhot/new_competition.html' %}
 	
 	<div id="competition">
-		<div class="left">
+		<div class="candidate left">
 			{% with candidate=competition.left winning_side=competition.SIDES.LEFT %}
 				{% include 'notorhot/competition_candidate.html' %}
 			{% endwith %}
@@ -16,7 +16,7 @@
 		
 		<span>vs.</span>
 		
-		<div class="right">
+		<div class="candidate right">
 			{% with candidate=competition.right winning_side=competition.SIDES.RIGHT %}
 				{% include 'notorhot/competition_candidate.html' %}
 			{% endwith %}
