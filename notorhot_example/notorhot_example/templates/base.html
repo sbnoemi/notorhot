@@ -1,0 +1,20 @@
+{% load i18n %}
+
+<html>
+	<head>
+		<title>{% block title %}{% trans "Not or Hot?" %}{% endblock %}</title>
+		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL}}notorhot_example/css/styles.css" />
+	</head>
+	<body {% block body_hooks %}{% endblock %}>
+		{% block body %}
+		{% endblock %}
+		
+		{% block leaderboard_link %}
+			{% if category %}
+				<div class="leaderbord_link">
+					<a href="{{ category.get_leaderboard_url }}">{% blocktrans %}{{ category }} Leaderboard{% endblocktrans %}</a>
+				</div>
+			{% endif %}
+		{% endblock %}
+	</body>
+</html>
