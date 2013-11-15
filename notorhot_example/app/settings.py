@@ -36,7 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'notorhot_example',
+    'notorhot_example.app',
     'sorl.thumbnail', 
     'model_utils',
     'notorhot',
@@ -51,9 +51,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'notorhot_example.urls'
+ROOT_URLCONF = 'notorhot_example.app.urls'
 
-WSGI_APPLICATION = 'notorhot_example.wsgi.application'
+WSGI_APPLICATION = 'notorhot_example.app.wsgi.application'
 
 
 # Database
