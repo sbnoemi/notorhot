@@ -44,9 +44,9 @@ This will automatically install django-notorhot's :ref:`dependencies <dependenci
 
 2. Add the ``notorhot`` module to your ``INSTALLED_APPS`` setting:
 
-``settings.py``
-
 .. code-block:: python
+
+   # settings.py
 
    INSTALLED_APPS = (
       ...
@@ -65,5 +65,16 @@ This will automatically install django-notorhot's :ref:`dependencies <dependenci
 Hooking Up the Views
 ====================
 
-Coming soon...
+django-notorhot comes "out of the box" with usable basic views for selecting competition categories, viewing and voting on competitions, viewing candidate details, and a leaderboard.  To use these views, include django-notorhot's urlconf in your own:
 
+.. code-block:: python
+
+   # urls.py
+      
+   urlpatterns = patterns('',
+      ...
+      url(r'any-custom-path/',  include('notorhot.urls')),
+      ...
+   )
+
+For more complex needs, you can also :doc:`extend django-notorhot's functionality <extending>` with custom templates, models, and/or views.

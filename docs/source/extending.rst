@@ -6,4 +6,19 @@ Extending django-notorhot
    :local:
    :backlinks: top   
 
+Custom Templates
+----------------
+
+Coming Soon...
+
+
+Additional Model Data
+---------------------
+
+Coming Soon...
+
+
+View Overrides
+--------------
+
 Coming Soon...
