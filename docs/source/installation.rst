@@ -58,7 +58,9 @@ This will automatically install django-notorhot's :ref:`dependencies <dependenci
 
 4. Add django-notorhot's URLs to your ``urlconf`` (:ref:`see below <setup_views>`).
 
-5. Add content (see :doc:`models` documentation).
+5. Make sure you have a ``base.html`` template with a ``{% block body %}`` block.  Or :doc:`override the default django-notorhot templates <extending>` to integrate with your project's template structure.
+
+6. Add content (see :doc:`models` documentation).
 
 
 .. _setup_views:
