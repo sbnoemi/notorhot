@@ -36,5 +36,6 @@ setup(
         'django-model-utils',
         'pillow',
         'django-autoslug',
+        'pytz',
     ],
 )
