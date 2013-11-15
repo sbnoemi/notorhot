@@ -18,13 +18,21 @@ Installation & Setup
    installation
    extending
 
-Reference
+Concepts
 ---------
 
 .. toctree::
    :maxdepth: 2
    
    models
+   
+Reference
+---------
+
+.. toctree::
+   :maxdepth: 2   
+
+   reference/index
 
 Code
 ----
