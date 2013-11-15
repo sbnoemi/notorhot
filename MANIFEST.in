@@ -1,4 +1,4 @@
-include LICENSE
+include LICENSE.TXT
 include README.rst
 recursive-include notorhot/static *
 recursive-include notorhot/templates *
