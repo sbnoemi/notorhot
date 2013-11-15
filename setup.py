@@ -8,7 +8,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-notorhot',
-    version='0.3',
+    version='0.3.1',
     packages=['notorhot', 'notorhot_example'],
     include_package_data=True,
     license='BSD License',  # example license
