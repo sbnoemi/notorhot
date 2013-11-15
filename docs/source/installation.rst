@@ -42,7 +42,7 @@ Installation
    
 This will automatically install django-notorhot's :ref:`dependencies <dependencies>`.
 
-2. Add the ``notorhot`` module to your ``INSTALLED_APPS`` setting:
+2. Add the ``sorl.thumbnail``, ``model_utils``, and ``notorhot`` modules to your ``INSTALLED_APPS`` setting:
 
 .. code-block:: python
 
@@ -50,6 +50,8 @@ This will automatically install django-notorhot's :ref:`dependencies <dependenci
 
    INSTALLED_APPS = (
       ...
+      'sorl.thumbnail',
+      'model_utils',
       'notorhot',
       ...
    )

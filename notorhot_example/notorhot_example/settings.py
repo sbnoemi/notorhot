@@ -37,6 +37,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'notorhot_example',
+    'sorl.thumbnail', 
+    'model_utils',
     'notorhot',
 )
 
