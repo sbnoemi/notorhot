@@ -1,0 +1,24 @@
+body {
+	font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
+}
+
+#competition {
+	overflow: hidden;
+}
+
+#competition .candidate,
+#competition span {
+	float: left;
+	text-align: center;
+}
+
+#competition span.vs {
+	display: block;
+	padding: 20px;
+	line-height: 300px;
+	font-size: 300%;
+}
+
+.leaderboard_link {
+	clear: both;
+}
