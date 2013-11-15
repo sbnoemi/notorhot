@@ -1,3 +1,8 @@
+* Extension docs
+* Docstrings
+* Package for PyPi
+* Hide candidate details and prevent votes for competitions for any Category that is no longer public.
+* Restrict competition generation to require matching categories
 * User-suggested options
 * Expire competitions after a certain date
 * Refactor views to declare model on class so can override with proxies / subclasses easily.  Esp. important for get_absolute_url overrides.
