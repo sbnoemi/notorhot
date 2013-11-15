@@ -10,7 +10,7 @@ Getting Started With django-notorhot
 Requirements
 ============
 
-django-notorhot requires Python 2.6+ as well as the packages listed below.
+django-notorhot requires Python 2.6 or 2.7 as well as the packages listed below.  It may also work on Python 3.x but has not yet been tested.
 
 Additionally, `South <https://pypi.python.org/pypi/South/>`_ is recommended but not required.
 
