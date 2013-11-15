@@ -1,5 +1,5 @@
 from sorl.thumbnail import ImageField
-from django.db.models.fields.files import ImageFileDescriptor
+from django.db.models.fields.files import FileDescriptor, ImageFileDescriptor
 
 
 class AutoDocumentableFileDescriptorMixin(object):
@@ -18,7 +18,14 @@ class AutoDocumentableFileDescriptorMixin(object):
     def __get__(self, instance=None, owner=None):
         if instance is None:
             return self
+            
+        return super(AutoDocumentableFileDescriptorMixin, self).__get__(
+            instance=instance, owner=owner)
         
+        
+class AutoDocumentableFileDescriptor(AutoDocumentableFileDescriptorMixin, 
+        FileDescriptor):
+    pass
         
 class AutoDocumentableImageFileDescriptor(AutoDocumentableFileDescriptorMixin, 
         ImageFileDescriptor):
@@ -26,4 +33,4 @@ class AutoDocumentableImageFileDescriptor(AutoDocumentableFileDescriptorMixin,
 
         
 class AutoDocumentableImageField(ImageField):
-    descriptor_class = AutoDocumentableImageFileDescriptor
+    descriptor_class = AutoDocumentableFileDescriptor
