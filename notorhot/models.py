@@ -48,7 +48,6 @@ class CandidateCategory(models.Model):
     def num_voted_competitions(self):
         return self.competitions.votable().count()
     num_voted_competitions = property(num_voted_competitions, doc="Competitions voted in")    
-    #num_voted_competitions.short_description = 'Competitions Voted In'
     
     class Meta:
         ordering = ('name',)
