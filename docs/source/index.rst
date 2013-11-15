@@ -6,11 +6,30 @@
 Welcome to django-notorhot's documentation!
 ===========================================
 
-Contents:
+**An extensible base for "Hot or Not" and "KittenWar" style websites.**
+
+
+Installation & Setup
+--------------------
 
 .. toctree::
    :maxdepth: 2
+   
+   installation
+   extending
 
+Reference
+---------
+
+.. toctree::
+   :maxdepth: 2
+   
+   models
+
+Code
+----
+
+https://github.com/sbnoemi/dango-notorhot
 
 
 Indices and tables
