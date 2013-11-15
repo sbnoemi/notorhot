@@ -36,7 +36,7 @@ Installation
 
 1. Install django-notorhot from Github::
 
-.. parsed-literal::
+.. code-block:: bash
    
    pip install -e git+https://github.com/sbnoemi/notorhot.git@0.2#egg=django-notorhot
    
@@ -56,11 +56,12 @@ This will automatically install django-notorhot's :ref:`dependencies <dependenci
 
 3. Update your database by running ``manage.py migrate notorhot`` (if you have South installed) or ``manage.py syncdb`` (if you don't).
 
-4. Add django-notorhot's URLs to your ``urlconf`` (:ref:`see below <setup_views>`.
+4. Add django-notorhot's URLs to your ``urlconf`` (:ref:`see below <setup_views>`).
 
 5. Add content (see :doc:`models` documentation).
 
-.. _setup_views::
+
+.. _setup_views:
 
 Hooking Up the Views
 ====================
