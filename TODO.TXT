@@ -1,5 +1,3 @@
-* Compress migrations
-* Extension docs
 * Docstrings
 * Real changelog
 * Package for PyPi
