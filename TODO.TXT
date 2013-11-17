@@ -1,4 +1,3 @@
-* Docstrings
 * Real changelog
 * Package for PyPi
 * Add to djangopackages

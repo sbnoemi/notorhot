@@ -13,7 +13,11 @@ from notorhot.utils import NeverCacheMixin, WorkingSingleObjectMixin, \
     CategoryMixin
 
 
-class CompetitionView(NeverCacheMixin, WorkingSingleObjectMixin, CategoryMixin, TemplateView):
+class CompetitionView(NeverCacheMixin, WorkingSingleObjectMixin, CategoryMixin, 
+        TemplateView):
+    """
+    Generates and displays a competition in the indicated category.
+    """
     template_name = 'notorhot/competition.html'
     insufficient_data_template_name = 'notorhot/insufficient_data.html'
     http_method_names = ['get',]
@@ -23,6 +27,10 @@ class CompetitionView(NeverCacheMixin, WorkingSingleObjectMixin, CategoryMixin, 
         return self.object
     
     def get_previous_vote(self):
+        """
+        If available, retrieves information saved in the session about the 
+        last :class:`~notorhot.models.Competition` the user voted on.
+        """
         previous = None
         previous_pk = self.request.session.get('last_vote_pk')
         
@@ -38,6 +46,10 @@ class CompetitionView(NeverCacheMixin, WorkingSingleObjectMixin, CategoryMixin, 
         return self.object.generate_competition()
     
     def get_context_data(self, *args, **kwargs):
+        """
+        Adds new :class:`~notorhot.models.Competition` instance and (if 
+        appropriate) previous vote data to context.
+        """
         context = super(CompetitionView, self).get_context_data(*args, **kwargs)
         
         try:
@@ -56,18 +68,31 @@ class CompetitionView(NeverCacheMixin, WorkingSingleObjectMixin, CategoryMixin, 
 # This might be simpler as an UpdateView, except that the form isn't a ModelForm.
 # Oh well.
 class VoteView(NeverCacheMixin, WorkingSingleObjectMixin, FormView):
+    """
+    Processes a vote on a :class:`~notorhot.models.Competition` and adds the 
+    :class:`~notorhot.models.Competition` instance's ID to the session as 
+    previous vote data (``reqest.session['last_vote_pk']``).
+    """
     template_name = 'notorhot/already_voted.html'
     http_method_names = ['post',]
     form_class = VoteForm
     queryset = Competition.votable.all()
         
     def form_valid(self, form):
+        """
+        Saves vote; adds :class:`~notorhot.models.Competition` instance PK to 
+        session as previous vote.
+        """
         form.save()
         # save in session for display on next competition
         self.request.session['last_vote_pk'] = self.object.pk
         return super(VoteView, self).form_valid(form)
     
-    def get_form_kwargs(self):        
+    def get_form_kwargs(self):
+        """
+        Adds :class:`~notorhot.models.Competition` instance to keyword arguments
+        used to initialize :class:`~notorhot.forms.VoteForm`.
+        """
         kwargs = super(VoteView, self).get_form_kwargs()
         kwargs.update({'competition': self.object})
         return kwargs
@@ -76,7 +101,11 @@ class VoteView(NeverCacheMixin, WorkingSingleObjectMixin, FormView):
         return self.object.category.get_absolute_url()
         
 
-class CandidateView(SingleObjectTemplateResponseMixin, CategoryMixin, BaseDetailView):
+class CandidateView(SingleObjectTemplateResponseMixin, CategoryMixin, 
+        BaseDetailView):
+    """
+    Displays details about a :class:`~notorhot.models.Candidate`.
+    """
     template_name = 'notorhot/candidate.html'
     http_method_names = ['get',]    
     queryset = Candidate.enabled.all()
@@ -87,6 +116,10 @@ class CandidateView(SingleObjectTemplateResponseMixin, CategoryMixin, BaseDetail
         
 
 class LeaderboardView(CategoryMixin, TemplateView):
+    """
+    Displays leaderboard (list of :class:`~notorhot.models.Candidate` instnaces 
+    with highest win percentage) for a category.
+    """
     template_name = 'notorhot/leaders.html'
     http_method_names = ['get',]
     leaderboard_length = 10
@@ -109,6 +142,10 @@ class LeaderboardView(CategoryMixin, TemplateView):
     
     
 class CategoryListView(TemplateView):
+    """
+    Lists and links to :class:`~notorhot.models.CandidateCategory` instances 
+    for which user can view and vote on competitions.
+    """
     template_name = 'notorhot/categories.html'
     http_method_names = ['get',]
     

@@ -4,16 +4,18 @@ from django.db.models.fields.files import FileDescriptor, ImageFileDescriptor
 
 class AutoDocumentableFileDescriptorMixin(object):
     """
-    Django FileFields (and by extension, Sorl ImageFields) cause 
-    ``sphinx.ext.autodoc`` to throw AttributeErrors because their descriptors 
-    raise AttributeErrors when accessed for model classes rather than instances.
+    Django :class:`FileField` (and by extension,  Sorl :class:`ImageField`) cause 
+    :mod:`sphinx.ext.autodoc` to throw an :exc:`AttributeError` because 
+    their descriptors raise :exc:`AttributeError` when accessed for model 
+    classes rather than instances.
     
-    This can be mixed into a Django FileDescriptor or ImageFileDescriptor and 
-    applied to any FileField subclass by subclassing the subclass and setting 
-    the ``descriptor_class`` class attribute on the FileField subclass.
+    This can be mixed into a Django :class:`FileDescriptor` or 
+    :class:`ImageFileDescriptor` and applied to any :class:`FileField` subclass 
+    by subclassing the subclass and setting the :attr:`descriptor_class` class 
+    attribute on the :class:`FileField` subclass.
     
-    See ``AutoDocumentableImageFileDescriptor`` and 
-    ``AutoDocumentableImageField``, below, for examples.
+    See source of :class:`AutoDocumentableImageFileDescriptor` and 
+    :class:`AutoDocumentableImageField` for examples.
     """
     def __get__(self, instance=None, owner=None):
         if instance is None:
@@ -33,4 +35,7 @@ class AutoDocumentableImageFileDescriptor(AutoDocumentableFileDescriptorMixin,
 
         
 class AutoDocumentableImageField(ImageField):
+    """
+    Sorl Thumbnail :class:`ImageField` subclass that is Sphinx Autodoc-friendly.
+    """
     descriptor_class = AutoDocumentableFileDescriptor
