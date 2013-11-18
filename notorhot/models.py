@@ -74,7 +74,7 @@ class CandidateCategory(models.Model):
             :class:`CandidateCategory` that have received votes.
         :rtype: integer
         """
-        return self.competitions.votable().count()
+        return self.competitions.count() - self.competitions.votable().count()
     num_voted_competitions = property(num_voted_competitions, doc="Competitions voted in")    
     
     class Meta:
