@@ -1,6 +1,7 @@
 import datetime
 
 from django.test import TestCase
+from django.core.exceptions import ValidationError
 
 from notorhot._tests.factories import mixer
 from notorhot.models import CandidateCategory, Candidate, Competition
@@ -108,4 +109,156 @@ class NotorHotCandidateTestCase(TestCase):
             
     
 class NotorHotCompetitionTestCase(TestCase):
-    pass
+    def test_votable_manager(self):
+        mixer.cycle(3).blend('notorhot.Competition', date_voted=None)
+        mixer.cycle(2).blend('notorhot.Competition', 
+            date_voted=datetime.datetime.now())
+
+        self.assertEqual(Competition.votable.count(), 3)
+        
+    def test_generating_manager(self):
+        self.assertEqual(Competition.objects.count(), 0)
+
+        cands = []
+        for i in range(6):
+            cands.append(mixer.blend('notorhot.Candidate', name='Cand%d' % i, 
+                votes=i, enabled=True))
+            
+        comp = Competition.objects.generate_from_candidates(cands[0], cands[1])
+        self.assertEqual(Competition.objects.count(), 1)
+        self.assertIsNone(comp.date_voted)
+        self.assertEqual(comp.left, cands[0])
+        self.assertEqual(comp.right, cands[1])
+        
+        unpopular = Candidate.objects.filter(votes__lt=3)
+        
+        for i in range(100):
+            comp = Competition.objects.generate_from_queryset(unpopular)        
+            self.assertEqual(Competition.objects.count(), i + 2)
+            self.assertTrue(comp.left in unpopular)
+            self.assertTrue(comp.right in unpopular)
+            
+        Competition.objects.delete()
+
+        self.assertEqual(Competition.objects.count(), 0)
+        
+        Competition.objects.generate()
+        self.assertEqual(Competition.objects.count(), 1)
+    
+    
+    def test_clean(self):
+        cat1 = mixer.blend('notorhot.CandidateCategory')
+        cat2 = mixer.blend('notorhot.CandidateCategory')
+        cands = mixer.cycle(3).blend('notorhot.Candidate', category=cat1, is_enabled=True)
+        cand_cat2 = mixer.blend('notorhot.Candidate', category=cat2, is_enabled=True)
+        
+        try:
+            comp = Competition(**{
+                'left': cands[0],
+                'right': cands[1],
+            })
+            comp.clean()
+        except ValidationError:
+            self.fail(u"Competition with no winner or category set should clean "
+                u"without trouble.")
+
+        try:
+            comp = Competition(**{
+                'left': cands[0],
+                'right': cands[1],
+                'winner': cands[0],
+                'category': cat1,
+            })
+            comp.clean()
+        except ValidationError:
+            self.fail(u"Competition with winner and category matching candidates "
+                u"shoudl clean without trouble")
+
+        # winner in same category but difft competition
+        with self.assertRaises(ValidationError):
+            comp = Competition(**{
+                'left': cands[0],
+                'right': cands[1],
+                'winner': cands[2],
+            })
+            comp.clean()
+
+        # category doesn't match candidates
+        with self.assertRaises(ValidationError):
+            comp = Competition(**{
+                'left': cands[0],
+                'right': cands[1],
+                'category': cat2,
+            })
+            comp.clean()
+
+        # candidates from different categories
+        with self.assertRaises(ValidationError):
+            comp = Competition(**{
+                'left': cands[0],
+                'right': cand_cat2,
+            })
+            comp.clean()
+            
+        
+    def test_save(self):
+        self.assertEqual(Competition.objects.count(), 0)
+        
+        cat1 = mixer.blend('notorhot.CandidateCategory')
+        cat2 = mixer.blend('notorhot.CandidateCategory')
+        cands = mixer.cycle(3).blend('notorhot.Candidate', category=cat1, 
+            is_enabled=True, challenges=0)
+                
+        comp = Competition(**{
+            'left': cands[0],
+            'right': cands[1],
+        })
+        
+        comp.save()
+        
+        self.assertEqual(Competition.objects.count(), 1)
+        self.assertEqual(cands[0].challenges, 1)
+        self.assertEqual(cands[1].challenges, 1)
+        self.assertEqual(comp.category, cat1)
+        self.assertIsNone(comp.winner)
+        self.assertIsNone(comp.winning_side)
+        self.assertIsNone(comp.date_voted)
+        self.assertIsNotNone(comp.date_presented)    
+        
+        # make sure saving again doesn't set any new values
+        comp.save()
+        
+        self.assertEqual(Competition.objects.count(), 1)
+        self.assertEqual(cands[0].challenges, 1)
+        self.assertEqual(cands[1].challenges, 1)
+        self.assertEqual(comp.category, cat1)
+        self.assertIsNone(comp.winner)
+        self.assertIsNone(comp.winning_side)
+        self.assertIsNone(comp.date_voted)
+        self.assertIsNotNone(comp.date_presented)    
+        
+        
+        
+    def test_record_vote(self):
+        cands = mixer.cycle(2).blend('notorhot.Candidate', is_enabled=True, 
+            challenges=0, votes=0, wins=0)
+            
+        comp = Competition.objects.generate_from_candidates(cands[0], cands[1])
+        
+        self.assertEqual(cands[0].challenges, 1)
+        self.assertEqual(cands[0].votes, 0)
+        self.assertEqual(cands[0].wins, 0)
+        self.assertIsNone(comp.winner)
+        self.assertIsNone(comp.winning_side)
+        self.assertIsNone(comp.date_voted)
+        
+        comp.record_vote(Competition.SIDES.RIGHT)
+
+        self.assertEqual(cands[0].challenges, 1)
+        self.assertEqual(cands[0].votes, 1)
+        self.assertEqual(cands[0].wins, 0)
+        self.assertEqual(cands[1].votes, 1)
+        self.assertEqual(cands[1].wins, 1)
+        self.assertEqual(comp.winner, cands[1])
+        self.assertEqual(comp.winning_side, Competition.SIDES.RIGHT)
+        self.assertIsNotNone(comp.date_voted)
