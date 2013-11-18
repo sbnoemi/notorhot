@@ -93,7 +93,7 @@ class CandidateQuerySet(models.query.QuerySet):
             percentage (wins/votes).
         :rtype: :class:`QuerySet`
         """
-        return self.extra(select={ 'win_pct': 'wins / votes', }).order_by(
+        return self.extra(select={ 'win_pct': '1.0 * wins / votes', }).order_by(
             '-win_pct')
             
     def for_category(self, category):
