@@ -329,9 +329,14 @@ class Competition(models.Model):
         if self.winner and self.winner.id not in (self.left.id, self.right.id):
             raise ValidationError(_(u"Winner must be one of the candidates "
                 u"offered on left or right."))
-                
+        
+        try:
+            category = self.category
+        except CandidateCategory.DoesNotExist:
+            category = None
+        
         if ((self.left.category != self.right.category) or 
-                (self.category and (self.left.category != self.category))):
+                (category and (self.left.category != category))):
             raise ValidationError(_(u"Both candidates for competition must "
                 u"belong to same category as competition."))
                 
