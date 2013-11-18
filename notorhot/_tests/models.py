@@ -37,8 +37,17 @@ class NotorHotCategoryTestCase(TestCase):
         
     
 class NotorHotCandidateTestCase(TestCase):
-    pass
-    
+    def test_order_by_wins(self):
+        # test ordered by % wins, not # wins
+        mixer.blend('notorhot.Candidate', votes=18, wins=9) # .5
+        mixer.blend('notorhot.Candidate', votes=15, wins=8) # .5333
+        mixer.blend('notorhot.Candidate', votes=12, wins=7) # .58333
+        mixer.blend('notorhot.Candidate', votes=9, wins=6) # .6667
+            
+        in_order = Candidate.objects.all().order_by_wins()
+        # get win count for ordered candidates = should be 6, 7, 8, 9
+        wins = [c.wins for c in in_order]
+        self.assertEqual(wins, [6, 7, 8, 9])
     
 class NotorHotCompetitionTestCase(TestCase):
     pass
