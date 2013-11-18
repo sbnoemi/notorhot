@@ -1,7 +1,6 @@
-* Real changelog
+* Hide candidate details and prevent votes for competitions for any Category that is no longer public.
 * Package for PyPi
 * Add to djangopackages
-* Hide candidate details and prevent votes for competitions for any Category that is no longer public.
 * Restrict competition generation to require matching categories
 * User-suggested options
 * Expire competitions after a certain date
