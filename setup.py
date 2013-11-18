@@ -37,5 +37,6 @@ setup(
         'pillow',
         'django-autoslug',
         'pytz',
+        'mixer',
     ],
 )
