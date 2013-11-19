@@ -15,6 +15,10 @@ class NotorHotCategoryTestCase(TestCase):
 
     def test_category_competition_generator(self):
         cat = mixer.blend('notorhot.CandidateCategory')
+        
+        with self.assertRaises(Candidate.DoesNotExist):
+            cat.generate_competition()
+        
         enabled = mixer.cycle(3).blend('notorhot.Candidate', category=cat, is_enabled=True)
         disabled = mixer.cycle(2).blend('notorhot.Candidate', category=cat, is_enabled=False)
         
@@ -64,7 +68,7 @@ class NotorHotCandidateTestCase(TestCase):
         
         self.assertEqual(Candidate.enabled.count(), 3)
         
-    def test_manger_and_queryset_chaining(self):
+    def test_manager_and_queryset_chaining(self):
         cat1 = mixer.blend('notorhot.CandidateCategory')
         cat2 = mixer.blend('notorhot.CandidateCategory')
         mixer.blend('notorhot.Candidate', votes=18, wins=9, category=cat1, is_enabled=True) # .5
@@ -103,9 +107,11 @@ class NotorHotCandidateTestCase(TestCase):
         self.assertEqual(cand.wins, 2)
         
     def test_win_percentage(self):
-        cand = mixer.blend('notorhot.Candidate', votes=10, wins=5)
-        
+        cand = mixer.blend('notorhot.Candidate', votes=10, wins=5)        
         self.assertEqual(cand.win_percentage, 50.0)
+        
+        cand = mixer.blend('notorhot.Candidate', votes=0, wins=0)
+        self.assertEqual(cand.win_percentage, 'No votes')
             
     
 class NotorHotCompetitionTestCase(TestCase):
@@ -117,6 +123,13 @@ class NotorHotCompetitionTestCase(TestCase):
         self.assertEqual(Competition.votable.count(), 3)
         
     def test_generating_manager(self):
+        with self.assertRaises(Candidate.DoesNotExist):
+            comp = Competition.objects.generate_from_queryset(
+                Candidate.objects.all()) 
+                
+        with self.assertRaises(Candidate.DoesNotExist):
+            comp = Competition.objects.generate()       
+
         self.assertEqual(Competition.objects.count(), 0)
 
         cands = []
@@ -149,8 +162,10 @@ class NotorHotCompetitionTestCase(TestCase):
     def test_clean(self):
         cat1 = mixer.blend('notorhot.CandidateCategory')
         cat2 = mixer.blend('notorhot.CandidateCategory')
-        cands = mixer.cycle(3).blend('notorhot.Candidate', category=cat1, is_enabled=True)
-        cand_cat2 = mixer.blend('notorhot.Candidate', category=cat2, is_enabled=True)
+        cands = mixer.cycle(3).blend('notorhot.Candidate', category=cat1, 
+            is_enabled=True)
+        cand_cat2 = mixer.blend('notorhot.Candidate', category=cat2, 
+            is_enabled=True)
         
         try:
             comp = Competition(**{
