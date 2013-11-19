@@ -1,0 +1,46 @@
+from copy import copy
+
+from django.test import RequestFactory
+
+
+# courtesy of http://tech.novapost.fr/django-unit-test-your-views-en.html
+def setup_view(view, request, *args, **kwargs):
+    """Mimic as_view() returned callable, but returns view instance.
+    args and kwargs are the same you would pass to ``reverse()``
+    """
+    view.request = request
+    view.args = args
+    view.kwargs = kwargs
+    return view
+    
+
+class ViewTestMixin(object):
+    view_class = None
+    
+    def make_request(self, method, data, session_data):
+        if method == 'post':
+            request = RequestFactory().post('/path/unimportant/', data=data)
+        else:
+            request = RequestFactory().get('/path/unimportant/', data=data)
+            
+        if session_data is not None:
+            request.session = copy(session_data)
+            
+        return request
+        
+    
+    def make_view(self, method, data={}, view_args=(), view_kwargs={}, 
+            request_args=(), request_kwargs={}, session_data=None):
+
+        request = self.make_request(method, data, session_data)
+        view = self.view_class(*view_args, **view_kwargs)
+
+        return setup_view(view, request, *request_args, **request_kwargs)
+
+    def run_view(self, method, data={}, view_args=(), view_kwargs={}, 
+            request_args=(), request_kwargs={}, session_data=None):
+            
+        request = self.make_request(method, data, session_data)        
+        view = self.view_class.as_view(*view_args, **view_kwargs)
+
+        return view(request, *request_args, **request_kwargs)
