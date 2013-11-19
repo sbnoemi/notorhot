@@ -1,4 +1,5 @@
-* Unit Tests
+* Tests
+   * Integration tests?
 * Hide candidate details and prevent votes for competitions for any Category that is no longer public.
 * throw an error in record_votes if competition already voted on
 * Package for PyPi
