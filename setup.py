@@ -38,5 +38,6 @@ setup(
         'django-autoslug',
         'pytz',
         'mixer',
+        'mock'
     ],
 )
