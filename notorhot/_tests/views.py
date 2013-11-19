@@ -172,4 +172,24 @@ class LeaderboardViewTestCase(ViewTestMixin, TestCase):
 
 
 class CategoryListViewTestCase(ViewTestMixin, TestCase):
-    pass
+    view_class = CategoryListView
+    
+    def test_get_categories(self):
+        cat1 = mixer.blend('notorhot.CandidateCategory')
+        cat2 = mixer.blend('notorhot.CandidateCategory')
+        cat3 = mixer.blend('notorhot.CandidateCategory', is_public=False)
+        view = self.make_view('get')
+        
+        view_cats = view.get_categories()
+        self.assertItemsEqual(view_cats, (cat1, cat2))
+        
+    def test_get_context_data(self):
+        view = self.make_view('get')
+
+        with patch.object(self.view_class, 'get_categories') as mock_get_categories:
+            mock_get_categories.return_value = ['category_list',]
+            
+            context = view.get_context_data()
+            
+            self.assertTrue('categories' in context)
+            self.assertEqual(context['categories'], ['category_list',])
