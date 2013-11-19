@@ -110,13 +110,66 @@ class VoteViewTestCase(ViewTestMixin, TestCase):
             self.assertEqual(success_url, '/a/url/')
 
 
-class CandidateViewTestCase(TestCase):
-    pass
+class CandidateViewTestCase(ViewTestMixin, TestCase):
+    view_class = CandidateView
+
+    def test_get_category(self):
+        cats = mixer.cycle(2).blend('notorhot.CandidateCategory')
+        cand = mixer.blend('notorhot.Candidate', category=cats[0])
+        view = self.make_view('get', view_kwargs={ 'object': cand, })
+        
+        cat = view.get_category()
+        self.assertEqual(cat, cats[0])
 
 
-class LeaderboardViewTestCase(TestCase):
-    pass
+class LeaderboardViewTestCase(ViewTestMixin, TestCase):
+    view_class = LeaderboardView
+    
+    def test_get_category(self):
+        cat = mixer.blend('notorhot.CandidateCategory')
+        view = self.make_view('get', request_kwargs={ 'category_slug': cat.slug, })
+        
+        view_cat = view.get_category()
+        self.assertEqual(view_cat, cat)
+        
+    def test_get_leaders(self):
+        cat1 = mixer.blend('notorhot.CandidateCategory')
+        cat2 = mixer.blend('notorhot.CandidateCategory')
+        
+        cand1 = mixer.blend('notorhot.Candidate', votes=18, wins=9, category=cat1, is_enabled=True) # .5
+        cand2 = mixer.blend('notorhot.Candidate', votes=15, wins=8, category=cat1, is_enabled=True) # .5333
+        cand3 = mixer.blend('notorhot.Candidate', votes=12, wins=7, category=cat1, is_enabled=True) # .58333
+        cand4 = mixer.blend('notorhot.Candidate', votes=9, wins=6, category=cat1, is_enabled=True) # .6667
+        
+        mixer.blend('notorhot.Candidate', votes=18, wins=17, category=cat2) 
+        mixer.blend('notorhot.Candidate', votes=15, wins=14, category=cat2) 
+        mixer.blend('notorhot.Candidate', votes=12, wins=11, category=cat2) 
+        mixer.blend('notorhot.Candidate', votes=9, wins=8, category=cat2) 
+        
+        mixer.blend('notorhot.Candidate', votes=18, wins=17, category=cat1, is_enabled=False) 
+        mixer.blend('notorhot.Candidate', votes=15, wins=14, category=cat1, is_enabled=False) 
+        mixer.blend('notorhot.Candidate', votes=12, wins=11, category=cat1, is_enabled=False) 
+        mixer.blend('notorhot.Candidate', votes=9, wins=8, category=cat1, is_enabled=False) 
+        
+        view = self.make_view('get', view_kwargs={ 'leaderboard_length': 3 },
+            request_kwargs={ 'category_slug': cat1.slug, })
+        
+        leaders = view.get_leaders()
+        self.assertEqual(list(leaders), [cand4, cand3, cand2,])
+
+        
+    def test_get_context_data(self):
+        cat = mixer.blend('notorhot.CandidateCategory')
+        view = self.make_view('get', request_kwargs={ 'category_slug': cat.slug, })
+
+        with patch.object(self.view_class, 'get_leaders') as mock_get_leaders:
+            mock_get_leaders.return_value = ['leader_list',]
+            
+            context = view.get_context_data()
+            
+            self.assertTrue('leaders' in context)
+            self.assertEqual(context['leaders'], ['leader_list',])
 
 
-class CategoryListViewTestCase(TestCase):
+class CategoryListViewTestCase(ViewTestMixin, TestCase):
     pass
