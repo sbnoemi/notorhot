@@ -76,8 +76,38 @@ class CompetitionViewTestCase(ViewTestMixin, TestCase):
         self.assertTrue('previous_vote' in context)
 
 
-class VoteViewTestCase(TestCase):
-    pass
+class VoteViewTestCase(ViewTestMixin, TestCase):
+    view_class = VoteView
+
+    def test_form_valid(self):
+        comp = mixer.blend('notorhot.Competition')
+        form = Mock()
+        view = self.make_view('post', view_kwargs={ 'object': comp, }, 
+            session_data={})
+        
+        resp = view.form_valid(form)
+        self.assertEqual(form.save.call_count, 1)
+        self.assertEqual(view.request.session['last_vote_pk'], comp.id)
+        
+        
+    def test_get_form_kwargs(self):
+        comp = mixer.blend('notorhot.Competition')
+        view = self.make_view('post', view_kwargs={ 'object': comp, })
+        
+        kwargs = view.get_form_kwargs()
+        self.assertTrue('competition' in kwargs)
+        self.assertEqual(kwargs['competition'], comp)
+        
+    def test_get_success_url(self):
+        comp = mixer.blend('notorhot.Competition')
+        view = self.make_view('post', view_kwargs={ 'object': comp, })
+        
+        with patch.object(comp.category, 'get_absolute_url') as mock_get_url:
+            mock_get_url.return_value = '/a/url/'
+            success_url = view.get_success_url()
+            
+            self.assertEqual(mock_get_url.call_count, 1)
+            self.assertEqual(success_url, '/a/url/')
 
 
 class CandidateViewTestCase(TestCase):
