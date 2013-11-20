@@ -47,10 +47,14 @@ class ViewTestMixin(object):
         
         
 def generate_leaderboard_data(cat1, cat2):
-    cand1 = mixer.blend('notorhot.Candidate', votes=18, wins=9, category=cat1, is_enabled=True) # .5
-    cand2 = mixer.blend('notorhot.Candidate', votes=15, wins=8, category=cat1, is_enabled=True) # .5333
-    cand3 = mixer.blend('notorhot.Candidate', votes=12, wins=7, category=cat1, is_enabled=True) # .58333
-    cand4 = mixer.blend('notorhot.Candidate', votes=9, wins=6, category=cat1, is_enabled=True) # .6667
+    cand1 = mixer.blend('notorhot.Candidate', votes=18, wins=9, category=cat1, 
+        is_enabled=True, name='Alpha') # .5
+    cand2 = mixer.blend('notorhot.Candidate', votes=15, wins=8, category=cat1, 
+        is_enabled=True, name='Beta') # .5333
+    cand3 = mixer.blend('notorhot.Candidate', votes=12, wins=7, category=cat1, 
+        is_enabled=True, name='Gamma') # .58333
+    cand4 = mixer.blend('notorhot.Candidate', votes=9, wins=6, category=cat1, 
+        is_enabled=True, name='Delta') # .6667
     
     mixer.blend('notorhot.Candidate', votes=18, wins=17, category=cat2) 
     mixer.blend('notorhot.Candidate', votes=15, wins=14, category=cat2) 

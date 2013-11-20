@@ -5,7 +5,8 @@ from django.test import TestCase
 from django.forms import ValidationError
 
 from notorhot._tests.factories import mixer
-from notorhot._tests._utils import setup_view, ViewTestMixin
+from notorhot._tests._utils import setup_view, ViewTestMixin, \
+    generate_leaderboard_data
 from notorhot.models import CandidateCategory, Candidate, Competition
 from notorhot.forms import VoteForm
 from notorhot.views import CompetitionView, VoteView, CandidateView, \
@@ -35,6 +36,7 @@ class CompetitionViewTestCase(TestCase):
         self.assertIsInstance(response.context['view'], CompetitionView)
         self.assertIsNotNone(response.context['competition'])
         self.assertEqual(response.context['competition'].category, cat)
+        self.assertEqual(response.context['category'], cat)
         self.assertContains(response, 'Alpha')
         self.assertContains(response, 'Beta')
         self.assertTemplateUsed(response, 'notorhot/competition.html')
@@ -107,12 +109,85 @@ class VoteViewTestCase(TestCase):
     
 
 class CandidateViewTestCase(TestCase):
-    pass
-    
+    def test_success(self):
+        cat = mixer.blend('notorhot.CandidateCategory', slug='cat-slug')
+        cand = mixer.blend('notorhot.Candidate', category=cat, name='Alpha', slug='alpha')
+
+        response = self.client.get('/candidate/cat-slug/alpha/')
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['view'], CandidateView)
+        self.assertIsNotNone(response.context['candidate'])
+        self.assertEqual(response.context['candidate'], cand)
+        self.assertIsNotNone(response.context['category'])
+        self.assertEqual(response.context['category'], cat)
+        self.assertContains(response, 'Alpha')
+        self.assertTemplateUsed(response, 'notorhot/candidate.html')
+
 
 class LeaderboardViewTestCase(TestCase):
-    pass
+    def test_success(self):
+        cat1 = mixer.blend('notorhot.CandidateCategory', slug='cat-slug')
+        cat2 = mixer.blend('notorhot.CandidateCategory')        
+        (cand1, cand2, cand3, cand4) = generate_leaderboard_data(cat1, cat2)
 
+        with patch.object(LeaderboardView, 'leaderboard_length', new=3):
+            response = self.client.get('/cat-slug/leaders/')
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['view'], LeaderboardView)
+        self.assertIsNotNone(response.context['leaders'])
+        self.assertEqual(list(response.context['leaders']), [cand4, cand3, cand2])
+        self.assertIsNotNone(response.context['category'])
+        self.assertEqual(response.context['category'], cat1)
+        self.assertContains(response, 'Beta')
+        self.assertContains(response, 'Gamma')
+        self.assertContains(response, 'Delta')
+        self.assertTemplateUsed(response, 'notorhot/leaders.html')
+        
+    def test_empty(self):
+        cat1 = mixer.blend('notorhot.CandidateCategory', slug='cat-slug')
+
+        response = self.client.get('/cat-slug/leaders/')
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['view'], LeaderboardView)
+        self.assertIsNotNone(response.context['leaders'])
+        self.assertEqual(len(response.context['leaders']), 0)
+        self.assertIsNotNone(response.context['category'])
+        self.assertEqual(response.context['category'], cat1)
+        self.assertNotContains(response, 'Beta')
+        self.assertNotContains(response, 'Gamma')
+        self.assertTemplateUsed(response, 'notorhot/leaders.html')
+        
 
 class CategoryListViewTestCase(TestCase):
-    pass
+    def test_success(self):
+        cat1 = mixer.blend('notorhot.CandidateCategory', name='Alpha')
+        cat2 = mixer.blend('notorhot.CandidateCategory', name='Beta')    
+        cat3 = mixer.blend('notorhot.CandidateCategory', name='Gamma', 
+            is_public=False)        
+
+        response = self.client.get('/')
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['view'], CategoryListView)
+        self.assertIsNotNone(response.context['categories'])
+        self.assertItemsEqual(response.context['categories'], [cat1, cat2])
+        self.assertContains(response, 'Alpha')
+        self.assertContains(response, 'Beta')
+        self.assertNotContains(response, 'Gamma')
+        self.assertTemplateUsed(response, 'notorhot/categories.html')
+        
+    def test_empty(self):
+        response = self.client.get('/')
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['view'], CategoryListView)
+        self.assertIsNotNone(response.context['categories'])
+        self.assertEqual(len(response.context['categories']), 0)
+        self.assertNotContains(response, 'Alpha')
+        self.assertNotContains(response, 'Beta')
+        self.assertNotContains(response, 'Gamma')
+        self.assertTemplateUsed(response, 'notorhot/categories.html')
+    
