@@ -38,7 +38,7 @@ Installation
 
 .. code-block:: bash
    
-   pip install -e git+https://github.com/sbnoemi/notorhot.git@0.3.2#egg=django-notorhot
+   pip install -e git+https://github.com/sbnoemi/notorhot.git@0.4#egg=django-notorhot
    
 This will automatically install django-notorhot's :ref:`dependencies <dependencies>`.
 
