@@ -5,7 +5,8 @@ from django.test import TestCase
 from django.forms import ValidationError
 
 from notorhot._tests.factories import mixer
-from notorhot._tests._utils import setup_view, ViewTestMixin
+from notorhot._tests._utils import setup_view, ViewTestMixin, \
+    generate_leaderboard_data
 from notorhot.models import CandidateCategory, Candidate, Competition
 from notorhot.views import CompetitionView, VoteView, CandidateView, \
     LeaderboardView, CategoryListView
@@ -136,21 +137,8 @@ class LeaderboardViewTestCase(ViewTestMixin, TestCase):
         cat1 = mixer.blend('notorhot.CandidateCategory')
         cat2 = mixer.blend('notorhot.CandidateCategory')
         
-        cand1 = mixer.blend('notorhot.Candidate', votes=18, wins=9, category=cat1, is_enabled=True) # .5
-        cand2 = mixer.blend('notorhot.Candidate', votes=15, wins=8, category=cat1, is_enabled=True) # .5333
-        cand3 = mixer.blend('notorhot.Candidate', votes=12, wins=7, category=cat1, is_enabled=True) # .58333
-        cand4 = mixer.blend('notorhot.Candidate', votes=9, wins=6, category=cat1, is_enabled=True) # .6667
-        
-        mixer.blend('notorhot.Candidate', votes=18, wins=17, category=cat2) 
-        mixer.blend('notorhot.Candidate', votes=15, wins=14, category=cat2) 
-        mixer.blend('notorhot.Candidate', votes=12, wins=11, category=cat2) 
-        mixer.blend('notorhot.Candidate', votes=9, wins=8, category=cat2) 
-        
-        mixer.blend('notorhot.Candidate', votes=18, wins=17, category=cat1, is_enabled=False) 
-        mixer.blend('notorhot.Candidate', votes=15, wins=14, category=cat1, is_enabled=False) 
-        mixer.blend('notorhot.Candidate', votes=12, wins=11, category=cat1, is_enabled=False) 
-        mixer.blend('notorhot.Candidate', votes=9, wins=8, category=cat1, is_enabled=False) 
-        
+        (cand1, cand2, cand3, cand4) = generate_leaderboard_data(cat1, cat2)
+
         view = self.make_view('get', view_kwargs={ 'leaderboard_length': 3 },
             request_kwargs={ 'category_slug': cat1.slug, })
         

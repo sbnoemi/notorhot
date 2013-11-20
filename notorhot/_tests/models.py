@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 from notorhot._tests.factories import mixer
+from notorhot._tests._utils import generate_leaderboard_data
 from notorhot.models import CandidateCategory, Candidate, Competition
 
 class NotorHotCategoryTestCase(TestCase):
@@ -71,26 +72,14 @@ class NotorHotCandidateTestCase(TestCase):
     def test_manager_and_queryset_chaining(self):
         cat1 = mixer.blend('notorhot.CandidateCategory')
         cat2 = mixer.blend('notorhot.CandidateCategory')
-        mixer.blend('notorhot.Candidate', votes=18, wins=9, category=cat1, is_enabled=True) # .5
-        mixer.blend('notorhot.Candidate', votes=15, wins=8, category=cat1, is_enabled=True) # .5333
-        mixer.blend('notorhot.Candidate', votes=12, wins=7, category=cat1, is_enabled=True) # .58333
-        mixer.blend('notorhot.Candidate', votes=9, wins=6, category=cat1, is_enabled=True) # .6667
         
-        mixer.blend('notorhot.Candidate', votes=18, wins=17, category=cat2) 
-        mixer.blend('notorhot.Candidate', votes=15, wins=14, category=cat2) 
-        mixer.blend('notorhot.Candidate', votes=12, wins=11, category=cat2) 
-        mixer.blend('notorhot.Candidate', votes=9, wins=8, category=cat2) 
-        
-        mixer.blend('notorhot.Candidate', votes=18, wins=17, category=cat1, is_enabled=False) 
-        mixer.blend('notorhot.Candidate', votes=15, wins=14, category=cat1, is_enabled=False) 
-        mixer.blend('notorhot.Candidate', votes=12, wins=11, category=cat1, is_enabled=False) 
-        mixer.blend('notorhot.Candidate', votes=9, wins=8, category=cat1, is_enabled=False) 
+        (cand1, cand2, cand3, cand4) = generate_leaderboard_data(cat1, cat2)
         
         in_order = Candidate.enabled.for_category(cat1).order_by_wins()
         # get win count for ordered candidates = should be 6, 7, 8, 9
         wins = [c.wins for c in in_order]
         self.assertEqual(wins, [6, 7, 8, 9])
-        self.assertEqual(in_order.count(), 4)
+        self.assertEqual(list(in_order), [cand4, cand3, cand2, cand1])
         
     def test_incrementing(self):
         cand = mixer.blend('notorhot.Candidate', challenges=1, votes=1, wins=1)

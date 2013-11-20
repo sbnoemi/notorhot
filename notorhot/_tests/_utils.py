@@ -1,7 +1,7 @@
 from copy import copy
 
 from django.test import RequestFactory
-
+from notorhot._tests.factories import mixer
 
 # courtesy of http://tech.novapost.fr/django-unit-test-your-views-en.html
 def setup_view(view, request, *args, **kwargs):
@@ -44,3 +44,22 @@ class ViewTestMixin(object):
         view = self.view_class.as_view(*view_args, **view_kwargs)
 
         return view(request, *request_args, **request_kwargs)
+        
+        
+def generate_leaderboard_data(cat1, cat2):
+    cand1 = mixer.blend('notorhot.Candidate', votes=18, wins=9, category=cat1, is_enabled=True) # .5
+    cand2 = mixer.blend('notorhot.Candidate', votes=15, wins=8, category=cat1, is_enabled=True) # .5333
+    cand3 = mixer.blend('notorhot.Candidate', votes=12, wins=7, category=cat1, is_enabled=True) # .58333
+    cand4 = mixer.blend('notorhot.Candidate', votes=9, wins=6, category=cat1, is_enabled=True) # .6667
+    
+    mixer.blend('notorhot.Candidate', votes=18, wins=17, category=cat2) 
+    mixer.blend('notorhot.Candidate', votes=15, wins=14, category=cat2) 
+    mixer.blend('notorhot.Candidate', votes=12, wins=11, category=cat2) 
+    mixer.blend('notorhot.Candidate', votes=9, wins=8, category=cat2) 
+    
+    mixer.blend('notorhot.Candidate', votes=18, wins=17, category=cat1, is_enabled=False) 
+    mixer.blend('notorhot.Candidate', votes=15, wins=14, category=cat1, is_enabled=False) 
+    mixer.blend('notorhot.Candidate', votes=12, wins=11, category=cat1, is_enabled=False) 
+    mixer.blend('notorhot.Candidate', votes=9, wins=8, category=cat1, is_enabled=False) 
+
+    return (cand1, cand2, cand3, cand4)
