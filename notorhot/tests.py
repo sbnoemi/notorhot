@@ -8,7 +8,7 @@ from notorhot._tests.views import CompetitionViewTestCase, VoteViewTestCase, \
 from notorhot._tests.integration import CompetitionViewTestCase as CompTestCast, \
     VoteViewTestCase as VoteTestCase, CandidateViewTestCase as CandTestCase, \
     LeaderboardViewTestCase as LeadTestCase, \
-    CategoryListViewTestCase as CatTestCase
+    CategoryListViewTestCase as CatTestCase, AbsoluteURLTestCase
 
 from notorhot._tests.utils import NeverCacheMixinTestCase, \
     WorkingSingleObjectMixinTestCase, CategoryMixinTestCase, \
