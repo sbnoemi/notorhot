@@ -13,7 +13,11 @@ from notorhot.views import CompetitionView, VoteView, CandidateView, \
     LeaderboardView, CategoryListView
 
 
-class AbsoluteURLTestCase(TestCase):
+class URLConfMixin(object):
+    urls = 'notorhot._tests.urls'
+
+
+class AbsoluteURLTestCase(URLConfMixin, TestCase):
     def test_get_urls(self):
         cat = mixer.blend('notorhot.CandidateCategory', slug='cat-slug')
         self.assertEqual(cat.get_absolute_url(), '/cat-slug/')
@@ -23,7 +27,7 @@ class AbsoluteURLTestCase(TestCase):
         self.assertEqual(cand.get_absolute_url(), '/candidate/cat-slug/cand-slug/')
 
 
-class CompetitionViewTestCase(TestCase):
+class CompetitionViewTestCase(URLConfMixin, TestCase):
     def test_success(self):
         cat = mixer.blend('notorhot.CandidateCategory', slug='cat-slug')
         mixer.blend('notorhot.CandidateCategory')
@@ -56,7 +60,7 @@ class CompetitionViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'notorhot/insufficient_data.html')
 
 
-class VoteViewTestCase(TestCase):
+class VoteViewTestCase(URLConfMixin, TestCase):
     def test_success(self):
         cat = mixer.blend('notorhot.CandidateCategory', slug='cat-slug')
         cand1 = mixer.blend('notorhot.Candidate', category=cat, name='Alpha')
@@ -108,7 +112,7 @@ class VoteViewTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
     
 
-class CandidateViewTestCase(TestCase):
+class CandidateViewTestCase(URLConfMixin, TestCase):
     def test_success(self):
         cat = mixer.blend('notorhot.CandidateCategory', slug='cat-slug')
         cand = mixer.blend('notorhot.Candidate', category=cat, name='Alpha', slug='alpha')
@@ -125,7 +129,7 @@ class CandidateViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'notorhot/candidate.html')
 
 
-class LeaderboardViewTestCase(TestCase):
+class LeaderboardViewTestCase(URLConfMixin, TestCase):
     def test_success(self):
         cat1 = mixer.blend('notorhot.CandidateCategory', slug='cat-slug')
         cat2 = mixer.blend('notorhot.CandidateCategory')        
@@ -161,7 +165,7 @@ class LeaderboardViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'notorhot/leaders.html')
         
 
-class CategoryListViewTestCase(TestCase):
+class CategoryListViewTestCase(URLConfMixin, TestCase):
     def test_success(self):
         cat1 = mixer.blend('notorhot.CandidateCategory', name='Alpha')
         cat2 = mixer.blend('notorhot.CandidateCategory', name='Beta')    
