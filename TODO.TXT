@@ -1,5 +1,6 @@
 * User-suggested options
 * Expire competitions after a certain date
+* Do we need any signals?  (e.g. on Competition.record_vote, competition generation)
 * Package for PyPi
 * Add to djangopackages
 * Refactor views to declare model on class so can override with proxies / subclasses easily.  Esp. important for get_absolute_url overrides.

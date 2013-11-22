@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 setup(
     name='django-notorhot',
     version='0.5',
-    packages=['notorhot', 'notorhot_example'],
+    packages=['notorhot', 'notorhot_example', 'notorhot.contrib.write_in',],
     include_package_data=True,
     license='BSD License',  # example license
     description='An extensible base for Hot-or-Not or KittenWar style sites',
