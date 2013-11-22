@@ -112,7 +112,10 @@ class CandidateView(SingleObjectTemplateResponseMixin, CategoryMixin,
     context_object_name = 'candidate'
     
     def get_category(self):
-        return self.object.category
+        cat = self.object.category
+        if not cat.is_public:
+            raise Http404
+        return cat
         
 
 class LeaderboardView(CategoryMixin, TemplateView):
@@ -125,7 +128,10 @@ class LeaderboardView(CategoryMixin, TemplateView):
     leaderboard_length = 10
     
     def get_category(self):
-        return self._get_category()
+        cat = self._get_category()
+        if not cat.is_public:
+            raise Http404
+        return cat    
     
     def get_leaders(self):
         return Candidate.enabled.for_category(self.category).order_by_wins(

@@ -3,6 +3,7 @@ from mock import Mock, patch
 
 from django.test import TestCase
 from django.forms import ValidationError
+from django.http import Http404
 
 from notorhot._tests.factories import mixer
 from notorhot._tests._utils import setup_view, ViewTestMixin, \
@@ -121,17 +122,31 @@ class CandidateViewTestCase(ViewTestMixin, TestCase):
         
         cat = view.get_category()
         self.assertEqual(cat, cats[0])
+        
+        cat = mixer.blend('notorhot.CandidateCategory', is_public=False)
+        cand = mixer.blend('notorhot.Candidate', category=cat)
+        view = self.make_view('get', view_kwargs={ 'object': cand, })
+        
+        with self.assertRaises(Http404):
+            view.get_category()
 
 
 class LeaderboardViewTestCase(ViewTestMixin, TestCase):
     view_class = LeaderboardView
     
     def test_get_category(self):
-        cat = mixer.blend('notorhot.CandidateCategory')
-        view = self.make_view('get', request_kwargs={ 'category_slug': cat.slug, })
+        cat1 = mixer.blend('notorhot.CandidateCategory')
+        view = self.make_view('get', request_kwargs={ 'category_slug': cat1.slug, })
         
         view_cat = view.get_category()
-        self.assertEqual(view_cat, cat)
+        self.assertEqual(view_cat, cat1)
+        
+        cat2 = mixer.blend('notorhot.CandidateCategory', is_public=False)
+        cand = mixer.blend('notorhot.Candidate', category=cat2)
+        view = self.make_view('get', request_kwargs={ 'category_slug': cat2.slug, })
+        
+        with self.assertRaises(Http404):
+            view.get_category()
         
     def test_get_leaders(self):
         cat1 = mixer.blend('notorhot.CandidateCategory')

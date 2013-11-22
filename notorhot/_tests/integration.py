@@ -127,6 +127,17 @@ class CandidateViewTestCase(URLConfMixin, TestCase):
         self.assertEqual(response.context['category'], cat)
         self.assertContains(response, 'Alpha')
         self.assertTemplateUsed(response, 'notorhot/candidate.html')
+        
+    def test_non_public(self):
+        cat = mixer.blend('notorhot.CandidateCategory', slug='cat-slug', 
+            is_public=False)
+        cand = mixer.blend('notorhot.Candidate', category=cat, name='Alpha', 
+            slug='alpha')
+
+        response = self.client.get('/candidate/cat-slug/alpha/')
+        
+        self.assertEqual(response.status_code, 404)
+        
 
 
 class LeaderboardViewTestCase(URLConfMixin, TestCase):
@@ -163,6 +174,14 @@ class LeaderboardViewTestCase(URLConfMixin, TestCase):
         self.assertNotContains(response, 'Beta')
         self.assertNotContains(response, 'Gamma')
         self.assertTemplateUsed(response, 'notorhot/leaders.html')
+        
+    def test_non_public(self):
+        cat1 = mixer.blend('notorhot.CandidateCategory', slug='cat-slug', is_public=False)
+        mixer.cycle(3).blend('notorhot.Candidate', category=cat1)
+
+        response = self.client.get('/cat-slug/leaders/')
+        
+        self.assertEqual(response.status_code, 404)
         
 
 class CategoryListViewTestCase(URLConfMixin, TestCase):
