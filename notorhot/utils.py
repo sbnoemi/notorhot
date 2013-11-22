@@ -1,9 +1,21 @@
+from django.template.response import TemplateResponse
 from django.utils.decorators import method_decorator
 from django.utils.functional import lazy_property
 from django.views.decorators.cache import never_cache
 from django.views.generic.detail import SingleObjectMixin
 
 from notorhot.models import CandidateCategory
+
+
+class ResetContentTemplateResponse(TemplateResponse):
+    """
+    A TemplateResponse subclass with a 205 (Reset Content) status code.  To be
+    used when user submits form with invalid values in 
+    :class:`~django.forms.fields.ChoiceField` or 
+    :class:`~django.forms.models.ModelChoiceField`.
+    """
+    status_code = 205
+
 
 # borrowed from https://github.com/brack3t/django-braces/pull/46
 # This stuff really should be in Django core.

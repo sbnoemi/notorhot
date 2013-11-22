@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse_lazy
 from notorhot.models import Competition, Candidate, CandidateCategory
 from notorhot.forms import VoteForm
 from notorhot.utils import NeverCacheMixin, WorkingSingleObjectMixin, \
-    CategoryMixin
+    CategoryMixin, ResetContentTemplateResponse
 
 
 class CompetitionView(NeverCacheMixin, WorkingSingleObjectMixin, CategoryMixin, 
@@ -73,7 +73,7 @@ class VoteView(NeverCacheMixin, WorkingSingleObjectMixin, FormView):
     :class:`~notorhot.models.Competition` instance's ID to the session as 
     previous vote data (``reqest.session['last_vote_pk']``).
     """
-    template_name = 'notorhot/already_voted.html'
+    template_name = 'notorhot/invalid_vote.html'
     http_method_names = ['post',]
     form_class = VoteForm
     queryset = Competition.votable.all()
@@ -106,6 +106,17 @@ class VoteView(NeverCacheMixin, WorkingSingleObjectMixin, FormView):
             self.request.session['last_vote_pk'] = self.object.pk
         return super(VoteView, self).form_valid(form)
     
+    def form_invalid(self, form):
+        """
+        Since we'll 404 if the competition has already been voted on, the only
+        way for a form to be invalid is for someone to submit a bogus POST 
+        request. This method overrides the parent method to set a response class
+        indicating that the user should refresh the form they submitted (i.e. 
+        pretending that we don't think this is a hacking attempt).
+        """
+        self.response_class = ResetContentTemplateResponse
+        return super(VoteView, self).form_invalid(form)
+        
     def get_form_kwargs(self):
         """
         Adds :class:`~notorhot.models.Competition` instance to keyword arguments

@@ -91,13 +91,13 @@ class VoteViewTestCase(URLConfMixin, TestCase):
 
         the_comp = Competition.objects.get(id=1)
             
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 205)
         self.assertIsNone(the_comp.winner)
         self.assertIsNone(the_comp.winning_side)
         self.assertIsNone(the_comp.date_voted)
         self.assertIsInstance(response.context['form'], VoteForm)
         self.assertIsInstance(response.context['view'], VoteView)
-        self.assertTemplateUsed(response, 'notorhot/already_voted.html')
+        self.assertTemplateUsed(response, 'notorhot/invalid_vote.html')
         
     def test_already_voted(self):
         cat = mixer.blend('notorhot.CandidateCategory', slug='cat-slug')

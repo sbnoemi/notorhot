@@ -10,7 +10,7 @@ from notorhot._tests.factories import mixer
 from notorhot._tests._utils import setup_view, ViewTestMixin
 from notorhot.models import CandidateCategory, Candidate, Competition
 from notorhot.utils import NeverCacheMixin, WorkingSingleObjectMixin, \
-    CategoryMixin
+    CategoryMixin, ResetContentTemplateResponse
 
 @never_cache
 def never_cache_procedural(unused_arg):
@@ -35,6 +35,12 @@ class ImplementedCategoryView(CategoryMixin, TemplateView):
     def get_category(self):
         return 'a category'
         
+
+class ResetContentResponseTestCase(TestCase):
+    def test_status_code(self):
+        resp = ResetContentTemplateResponse('hi')
+        self.assertEqual(resp.status_code, 205)
+
 
 class NeverCacheMixinTestCase(ViewTestMixin, TestCase):
     view_class = NeverCacheView
