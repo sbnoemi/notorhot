@@ -266,3 +266,8 @@ class NotorHotCompetitionTestCase(TestCase):
         self.assertEqual(comp.winner, cands[1])
         self.assertEqual(comp.winning_side, Competition.SIDES.RIGHT)
         self.assertIsNotNone(comp.date_voted)
+        
+        # shouldn't be able to record a vote on a competition that's already
+        # been voted on
+        with self.assertRaises(Competition.AlreadyVoted):
+            comp.record_vote(Competition.SIDES.RIGHT)

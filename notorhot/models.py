@@ -362,6 +362,9 @@ class Competition(models.Model):
         Records the winning candidate on the :class:`Competition`.  Also updates 
         statistics on both :class:`Candidate` records.
         """
+        if self.date_voted is not None:
+            raise self.AlreadyVoted()
+        
         self.winning_side = winner
         
         if winner == self.SIDES.LEFT:
@@ -375,4 +378,7 @@ class Competition(models.Model):
         self.date_voted = datetime.datetime.now()
         
         self.save()
+        
+    class AlreadyVoted(RuntimeError):
+        pass
         

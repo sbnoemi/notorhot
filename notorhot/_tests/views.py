@@ -1,5 +1,5 @@
 import datetime
-from mock import Mock, patch
+from mock import Mock, patch, MagicMock, PropertyMock
 
 from django.test import TestCase
 from django.forms import ValidationError
@@ -80,7 +80,7 @@ class CompetitionViewTestCase(ViewTestMixin, TestCase):
 
 class VoteViewTestCase(ViewTestMixin, TestCase):
     view_class = VoteView
-
+    
     def test_form_valid(self):
         comp = mixer.blend('notorhot.Competition')
         form = Mock()
@@ -90,6 +90,18 @@ class VoteViewTestCase(ViewTestMixin, TestCase):
         resp = view.form_valid(form)
         self.assertEqual(form.save.call_count, 1)
         self.assertEqual(view.request.session['last_vote_pk'], comp.id)
+                
+        comp2 = mixer.blend('notorhot.Competition', date_voted=mixer.fake)
+        form = MagicMock()
+        type(form).save = PropertyMock(side_effect=Competition.AlreadyVoted)
+        view = self.make_view('post', view_kwargs={ 'object': comp2, }, 
+            session_data={})
+        
+        try:
+            resp = view.form_valid(form)
+        except Competition.AlreadyVoted:
+            self.fail("VoteView.form_valid() should swallow "
+                "Competition.AlreadyVoted exceptions")
         
         
     def test_get_form_kwargs(self):

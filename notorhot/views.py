@@ -82,10 +82,28 @@ class VoteView(NeverCacheMixin, WorkingSingleObjectMixin, FormView):
         """
         Saves vote; adds :class:`~notorhot.models.Competition` instance PK to 
         session as previous vote.
+        
+        .. note:: 
+            This method swallows Competition.AlreadyVoted errors under the
+            assumption that most are due to user error (clicking the form button 
+            twice before the next page can load) rather than anything malicious.
+            This behavior can be overridden by subclassing 
+            :class:`~notorhot.views.VoteView`, overriding this method, and 
+            hooking up the subclass to the urlconf (see :doc:`Extending NotorHot 
+            documentation <../extending>`).
         """
-        form.save()
-        # save in session for display on next competition
-        self.request.session['last_vote_pk'] = self.object.pk
+        try:
+            form.save()
+        except Competition.AlreadyVoted:
+            # if the competition's already been voted in, there's a pretty 
+            # good chance this was just because the user double-clicked the 
+            # submit button or something.  The most user-friendly thing to do
+            # here is to swallow the error and just give them a new 
+            # Competition anyway.
+            pass
+        else:
+            # save in session for display on next competition
+            self.request.session['last_vote_pk'] = self.object.pk
         return super(VoteView, self).form_valid(form)
     
     def get_form_kwargs(self):
