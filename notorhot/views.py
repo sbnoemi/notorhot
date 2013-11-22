@@ -93,6 +93,9 @@ class VoteView(NeverCacheMixin, WorkingSingleObjectMixin, FormView):
         Adds :class:`~notorhot.models.Competition` instance to keyword arguments
         used to initialize :class:`~notorhot.forms.VoteForm`.
         """
+        if not self.object.category.is_public:
+            raise Http404
+            
         kwargs = super(VoteView, self).get_form_kwargs()
         kwargs.update({'competition': self.object})
         return kwargs

@@ -110,6 +110,16 @@ class VoteViewTestCase(URLConfMixin, TestCase):
             data={ 'winner': Competition.SIDES.LEFT, })
             
         self.assertEqual(response.status_code, 404)
+        
+    def test_non_public(self):
+        cat = mixer.blend('notorhot.CandidateCategory', slug='cat-slug', 
+            is_public=False)
+        comp = mixer.blend('notorhot.Competition', category=cat, id=1)
+        
+        response = self.client.post('/vote/1/', follow=False,
+            data={ 'winner': Competition.SIDES.LEFT, })
+            
+        self.assertEqual(response.status_code, 404)
     
 
 class CandidateViewTestCase(URLConfMixin, TestCase):

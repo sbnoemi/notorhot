@@ -100,6 +100,14 @@ class VoteViewTestCase(ViewTestMixin, TestCase):
         self.assertTrue('competition' in kwargs)
         self.assertEqual(kwargs['competition'], comp)
         
+        cat = mixer.blend('notorhot.CandidateCategory', is_public=False)
+        comp2 = mixer.blend('notorhot.Competition', category=cat)
+        view = self.make_view('post', view_kwargs={ 'object': comp2, })
+        
+        with self.assertRaises(Http404):
+            view.get_form_kwargs()
+        
+        
     def test_get_success_url(self):
         comp = mixer.blend('notorhot.Competition')
         view = self.make_view('post', view_kwargs={ 'object': comp, })

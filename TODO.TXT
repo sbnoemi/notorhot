@@ -1,4 +1,3 @@
-* Prevent votes for competitions for any Category that is no longer public.
 * throw an error in record_votes if competition already voted on
 * VoteView 404s if competition already voted on, so validation failure should return a hack attempt / illegal operation template instead
 * Package for PyPi
