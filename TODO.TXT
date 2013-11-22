@@ -1,6 +1,6 @@
-* Package for PyPi
-* Add to djangopackages
 * User-suggested options
 * Expire competitions after a certain date
+* Package for PyPi
+* Add to djangopackages
 * Refactor views to declare model on class so can override with proxies / subclasses easily.  Esp. important for get_absolute_url overrides.
 * Compare on multiple factors (hotness; resemblance to Edward Scissorhands)
