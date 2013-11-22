@@ -253,26 +253,6 @@ class CompetitionGeneratingManager(CompetitionManager):
 
         return self.generate_from_candidates(first_2[0], first_2[1])
         
-    def generate(self):
-        """
-        Selects two :class:`Candidate` instances at random from the pool of all
-        :class:`Candidate` instances, and creates a new :class:`Competition` 
-        between them.
-        
-        :returns: new :class:`Competition` between two :class:`Candidate` 
-            instances selected at random
-        :rtype: :class:`Competition`
-        
-        .. warning::
-            Use at your own risk.
-            
-            This method is liable tto generate a :class:`Competition` between 
-            :class:`Candidates <Candidate>` belonging to different categories, 
-            which is technically in violation of our business constraints.  No
-            validation currently exists to prevent this case.
-        """
-        return self.generate_from_queryset(Candidate.enabled.all())
-
 
 class VotableCompetitionManager(CompetitionManager):
     """

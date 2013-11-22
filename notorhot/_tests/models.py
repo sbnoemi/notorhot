@@ -116,9 +116,6 @@ class NotorHotCompetitionTestCase(TestCase):
             comp = Competition.objects.generate_from_queryset(
                 Candidate.objects.all()) 
                 
-        with self.assertRaises(Candidate.DoesNotExist):
-            comp = Competition.objects.generate()       
-
         self.assertEqual(Competition.objects.count(), 0)
 
         cands = []
@@ -144,9 +141,6 @@ class NotorHotCompetitionTestCase(TestCase):
 
         self.assertEqual(Competition.objects.count(), 0)
         
-        Competition.objects.generate()
-        self.assertEqual(Competition.objects.count(), 1)
-    
     
     def test_clean(self):
         cat1 = mixer.blend('notorhot.CandidateCategory')
