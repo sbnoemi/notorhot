@@ -118,29 +118,36 @@ class NotorHotCompetitionTestCase(TestCase):
                 
         self.assertEqual(Competition.objects.count(), 0)
 
+        cats = mixer.cycle(2).blend('notorhot.CandidateCategory')
+
         cands = []
-        for i in range(6):
+        for i in range(10):
             cands.append(mixer.blend('notorhot.Candidate', name='Cand%d' % i, 
-                votes=i, enabled=True))
+                votes=i, enabled=True, category=cats[i % 2]))
+
+        # candidates must have same category
+        with self.assertRaises(Competition.objects.NonMatchingCategory):    
+            Competition.objects.generate_from_candidates(cands[0], cands[1])
             
-        comp = Competition.objects.generate_from_candidates(cands[0], cands[1])
+        with self.assertRaises(Competition.objects.NonMatchingCategory):    
+            Competition.objects.generate_from_queryset(Candidate.objects.all())
+
+        self.assertEqual(Competition.objects.count(), 0)
+
+        comp = Competition.objects.generate_from_candidates(cands[0], cands[2])
         self.assertEqual(Competition.objects.count(), 1)
         self.assertIsNone(comp.date_voted)
         self.assertEqual(comp.left, cands[0])
-        self.assertEqual(comp.right, cands[1])
+        self.assertEqual(comp.right, cands[2])
         
-        unpopular = Candidate.objects.filter(votes__lt=3)
+        popular = Candidate.objects.filter(category=cats[0], votes__gt=3)
         
         for i in range(100):
-            comp = Competition.objects.generate_from_queryset(unpopular)        
+            comp = Competition.objects.generate_from_queryset(popular)        
             self.assertEqual(Competition.objects.count(), i + 2)
-            self.assertTrue(comp.left in unpopular)
-            self.assertTrue(comp.right in unpopular)
-            
-        Competition.objects.delete()
+            self.assertTrue(comp.left in popular)
+            self.assertTrue(comp.right in popular)
 
-        self.assertEqual(Competition.objects.count(), 0)
-        
     
     def test_clean(self):
         cat1 = mixer.blend('notorhot.CandidateCategory')
@@ -238,8 +245,9 @@ class NotorHotCompetitionTestCase(TestCase):
         
         
     def test_record_vote(self):
+        cat = mixer.blend('notorhot.CandidateCategory')
         cands = mixer.cycle(2).blend('notorhot.Candidate', is_enabled=True, 
-            challenges=0, votes=0, wins=0)
+            challenges=0, votes=0, wins=0, category=cat)
             
         comp = Competition.objects.generate_from_candidates(cands[0], cands[1])
         

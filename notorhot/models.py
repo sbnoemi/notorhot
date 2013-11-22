@@ -216,10 +216,15 @@ class CompetitionGeneratingManager(CompetitionManager):
             display
         :arg right: :class:`Candidate` instance for the right side of the vote 
             display
+        :raises: :exc:`CompetitionGeneratingManager.NonMatchingCategory` if 
+            ``left`` and ``right`` belong to different categories.
         :returns: a new (not yet voted on) :class:`Competition` instance with 
             the specified "left" and "right" :class:`Candidate` instances.
         :rtype: :class:`Competition`
         """
+        if left.category != right.category:
+            raise self.NonMatchingCategory()
+        
         return self.create(**{
             'left': left,
             'right': right,
@@ -232,6 +237,8 @@ class CompetitionGeneratingManager(CompetitionManager):
         
         :arg queryset: pool of :class:`Candidate` instances from which to select
         :type queryset: :class:`QuerySet`
+        :raises: :exc:`CompetitionGeneratingManager.NonMatchingCategory` if
+            ``queryset`` contains candidates from multiple categories
         :returns: new :class:`Competition` between two :class:`Candidate` 
             instances selected at random from ``queryset``
         :rtype: :class:`Competition`
@@ -244,6 +251,15 @@ class CompetitionGeneratingManager(CompetitionManager):
             which is technically in violation of our business constraints.  No 
             validation currently exists to prevent this case.            
         """
+        # Make sure our queryset only contains Candidates from a single Category
+        # Because .values(), .order_by(), and .distinct() can interfere with one
+        # another, and we can't guarantee that no ordering is applied, we can't
+        # do this in the ORM and thus must instead handle it in Python.  Yuck.
+        category_ids = queryset.values_list('category__id', flat=True)
+        category_ids = set(category_ids)
+        if len(category_ids) > 1:
+            raise self.NonMatchingCategory()            
+
         # randomize queryset order, then select first two objects
         first_2 = queryset.order_by('?')[:2]
         
@@ -252,6 +268,15 @@ class CompetitionGeneratingManager(CompetitionManager):
             raise Candidate.DoesNotExist
 
         return self.generate_from_candidates(first_2[0], first_2[1])
+        
+    
+    class NonMatchingCategory(ValueError):
+        """
+        :class:`ValueError` subclass raised when an attempt is made to generate 
+        a :class:`Competition` from a set of :class:`Candidate` instances that
+        do not all belong to the same :class:`Category <CandidateCategory>`.
+        """
+        pass
         
 
 class VotableCompetitionManager(CompetitionManager):
@@ -341,6 +366,8 @@ class Competition(models.Model):
         """
         Records the winning candidate on the :class:`Competition`.  Also updates 
         statistics on both :class:`Candidate` records.
+        
+        :raises: :exc:`Competition.AlreadyVoted`
         """
         if self.date_voted is not None:
             raise self.AlreadyVoted()
@@ -360,5 +387,9 @@ class Competition(models.Model):
         self.save()
         
     class AlreadyVoted(RuntimeError):
+        """
+        Exception raised when attempt is made to record a vote on a 
+        :class:`Competition` that already has one recorded.
+        """
         pass
         

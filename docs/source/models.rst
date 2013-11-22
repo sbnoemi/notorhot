@@ -54,7 +54,7 @@ Competition also has fields to record:
 
 ``Competition``'s managers use a custom ``QuerySet`` class that offers a ``.votable()`` method to filter by whether the Competition has already been voted on.  Because this is a queryset rather than manager method, it can be chained with normal queryset methods such as ``.filter()`` and ``.order_by``.  
 
-Competition's managers also include methods to generate new Competitions -- either selecting two Candidates at random from all enabled Candidates; selecting two Candidates from a provided QuerySet; or from two specific candidates.  Note that currently these manager methods are capable of producing Competition instances whose Candidates are from differing Categories.  This may be fixed in future releases. 
+Competition's managers also include methods to generate new Competitions -- either selecting two Candidates at random from all enabled Candidates; selecting two Candidates from a provided QuerySet; or from two specific candidates.  If the QuerySet contains Candidates from multiple Categories, a ``CompetitionGeneratingManager.NonMatchingCategory`` exception will be raised.
 
 In addition to the standard manager, a ``Competition.votable`` manager is available that returns only Competitions that have not yet been voted on and that are thus still eligible to record new votes.
 

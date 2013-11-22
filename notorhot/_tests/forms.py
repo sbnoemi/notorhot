@@ -25,7 +25,8 @@ class NotorHotVoteFormTestCase(TestCase):
         self.assertFalse(form.is_valid())
         
     def test_save(self):
-        cands = mixer.cycle(2).blend('notorhot.Candidate', enabled=True)
+        cat = mixer.blend('notorhot.CandidateCategory')
+        cands = mixer.cycle(2).blend('notorhot.Candidate', enabled=True, category=cat)
         comp = Competition.objects.generate_from_candidates(cands[0], cands[1])
         
         form = VoteForm({ 'winner': Competition.SIDES.LEFT, }, competition=comp)
