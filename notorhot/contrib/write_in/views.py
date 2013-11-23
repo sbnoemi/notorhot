@@ -45,6 +45,6 @@ class WriteInDefaultView(WriteInBaseView):
             
         
         
-class WriteInThanksView(View):
-    def dispatch(self, *args, **kwargs):
-        return HttpResponse('thanks')
+class WriteInThanksView(TemplateView):
+    template_name = 'write_in/thanks.html'
+    allowed_methods = ['get',]
