@@ -66,4 +66,5 @@ class SubmitterInfoMixin(models.Model):
 
 
 class DefaultWriteIn(SubmitterInfoMixin, WriteInBase):
-    pass
+    class Meta:
+        verbose_name = _l(u"Write-in Candidate")

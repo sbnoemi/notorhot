@@ -1,5 +1,5 @@
 * User-suggested options
-   * Admin
+   * Admin: mix-ins?
    * Signals
    * Tests
    * Docs
