@@ -17,6 +17,9 @@ class WriteInBase(models.Model):
     )
 
     candidate_name = models.CharField(max_length=100)
+    # NOTE: we won't restrict to public categories in case we're gathering for
+    # a new upcoming category.
+    category = models.ForeignKey('notorhot.CandidateCategory')
     status = models.PositiveIntegerField(blank=True, choices=STATUS,
         default=STATUS.SUBMITTED)
     date_submitted = models.DateTimeField(auto_now_add=True)
