@@ -4,5 +4,6 @@ from notorhot.contrib.write_in.views import WriteInDefaultView, WriteInThanksVie
 
 urlpatterns = patterns('',    
     url(r'^$', WriteInDefaultView.as_view(), name='write_in_submit'),
-    url(r'^thanks/$', WriteInThanksView.as_view(), name='write_in_thanks'),
+    url(r'^(?P<category_slug>[\w-]+)/thanks/$', WriteInThanksView.as_view(), name='write_in_thanks'),
+    url(r'^(?P<category_slug>[\w-]+)/$', WriteInDefaultView.as_view(), name='write_in_submit'),
 )

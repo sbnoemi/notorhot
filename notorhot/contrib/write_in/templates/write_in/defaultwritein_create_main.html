@@ -2,7 +2,9 @@
 
 	<h1>{% trans "Suggest a Candidate" %}</h1>
 	
-	{% include 'notorhot/new_competition.html' %}
+	{% if category %}
+		{% include 'notorhot/new_competition.html' %}
+	{% endif %}
 	
 	<div id="write_in_form_wrapper">	
 		<form id="write_in_form" method="post" action="{% url 'write_in_submit' %}" />

@@ -20,6 +20,7 @@ class RichFormFactoryCreateView(CreateView):
     MODELFORM_KWARGS = ['form', 'formfield_callback', 'widgets', 
         'localized_fields', 'labels', 'help_texts', 'error_messages',]
 
+    # @TODO: refactor custom logic into separate method for ease of testing.
     def get_form_class(self):
         """
         Returns the form class to use in this view.  
@@ -68,7 +69,7 @@ class RichFormFactoryCreateView(CreateView):
                 fields = [f for f in fields if f not in self.exclude_fields]
         else:
             fields = copy(self.fields)
-
+            
         kwargs = {}
         for kwarg_name in self.MODELFORM_KWARGS:
             val = getattr(self, kwarg_name, None)
