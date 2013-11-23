@@ -1,4 +1,10 @@
 * User-suggested options
+   * Need categories
+   * Thanks view
+   * Admin
+   * Signals
+   * Tests
+   * Docs
 * Expire competitions after a certain date
 * Do we need any signals?  (e.g. on Competition.record_vote, competition generation)
 * Package for PyPi

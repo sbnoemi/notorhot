@@ -1,0 +1,16 @@
+{% load i18n %}
+
+	<h1>{% trans "Suggest a Candidate" %}</h1>
+	
+	{% include 'notorhot/new_competition.html' %}
+	
+	<div id="write_in_form_wrapper">	
+		<form id="write_in_form" method="post" action="{% url 'write_in_submit' %}" />
+			{% csrf_token %}
+			<ul class="form_list">
+				{{ form.as_ul }}
+				<input type="submit" value="{% trans 'Submit' %}" />
+			</ul>
+		</form>
+	</div><!-- /candidate_data -->
+
