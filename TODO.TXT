@@ -1,6 +1,8 @@
 * User-suggested options
    * Signals
    * Tests
+   * RFFCV should be a mixin, to use on EditViews too
+   * Refactor RFFCV.get_form_class() for easier overrides
    * Docs
 * Expire competitions after a certain date
 * Do we need any signals?  (e.g. on Competition.record_vote, competition generation)
