@@ -8,7 +8,7 @@ from notorhot._tests.factories import mixer
 from notorhot.models import CandidateCategory
 from notorhot.contrib.write_in.models import DefaultWriteIn, WriteInBase, \
     SubmitterInfoMixin
-from notorhot.contrib.write_in._tests.utils import ModelTestCase as TestCase
+from notorhot.contrib.write_in._tests._utils import ModelTestCase as TestCase
 
 from model_utils.tracker import FieldInstanceTracker
 
