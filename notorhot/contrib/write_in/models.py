@@ -41,7 +41,13 @@ class WriteInBase(models.Model):
         created = True
         if not self.pk:
             created = False
-            if self.status is None:
+
+        if self.status is None:
+            # Prohibit clearing status by simply reverting it.
+            if self.pk:
+                self.status = prev_status
+            # for new instances, initial status should be "Submitted"
+            else:
                 self.status = self.STATUS.SUBMITTED
             
         super(WriteInBase, self).save(*args, **kwargs)
