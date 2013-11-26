@@ -1,3 +1,2 @@
-from django.test import TestCase
-
-# Create your tests here.
+from notorhot.contrib.write_in._tests.models import WriteInBaseTestCase, \
+    SubmitterInfoMixinTestCase, DefaultWriteInTestCase
