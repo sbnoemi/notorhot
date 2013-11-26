@@ -29,29 +29,29 @@ class WriteInBase(models.Model):
         submission_tracker.finalize_class(self.__class__, 'submission_tracker')
         super(WriteInBase, self).__init__(*args, **kwargs)
     
-    def save(self, *args, **kwargs):
-        
-        # new status
-        prev_status = self.submission_tracker.previous('status') 
+    def _save_status(self, prev_status):
         if prev_status == self.STATUS.SUBMITTED and \
                 self.status != self.STATUS.SUBMITTED:
             self.date_processed = datetime.datetime.now()
             # @TODO: send signal!
-
-        created = True
-        if not self.pk:
-            created = False
-
-        if self.status is None:
-            # Prohibit clearing status by simply reverting it.
-            if self.pk:
-                self.status = prev_status
-            # for new instances, initial status should be "Submitted"
-            else:
-                self.status = self.STATUS.SUBMITTED
             
-        super(WriteInBase, self).save(*args, **kwargs)
-        
+    def _handle_null_status(self, prev_status):
+        # Prohibit clearing status by simply reverting it.
+        if self.pk:
+            self.status = prev_status
+        # for new instances, initial status should be "Submitted"
+        else:
+            self.status = self.STATUS.SUBMITTED
+    
+    def save(self, *args, **kwargs):
+        # deal with status changes
+        prev_status = self.submission_tracker.previous('status') 
+        self._save_status(prev_status)
+        if self.status is None:
+            self._handle_null_status(prev_status)
+
+        created = (self.pk is None)
+        super(WriteInBase, self).save(*args, **kwargs)      
         if created:
             # @TODO: send created signal
             pass
