@@ -58,10 +58,8 @@ class RichFormFactoryCreateView(CreateView):
         if self.fields is None:
             # _meta.get_all_field_names() gives us the fields for the form
             # but in the wrong order.
-            fields_for_form = model._meta.get_all_field_names()
+            fields = model._meta.get_all_field_names()
             
-            # but _meta.fields is in the correct order
-            fields = [f.name for f in model._meta.fields if f.name in fields_for_form]
             
             if self.exclude_fields:
                 # we could do this with set conversions, but it screws up field
