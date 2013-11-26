@@ -18,27 +18,24 @@ def get_write_in_model():
 
 class RichFormFactoryCreateView(CreateView):
     MODELFORM_KWARGS = ['form', 'formfield_callback', 'widgets', 
-        'localized_fields', 'labels', 'help_texts', 'error_messages',]
+        'localized_fields', 'labels', 'help_texts', 'error_messages',
+        'fields', 'exclude_fields']
 
     # @TODO: refactor custom logic into separate method for ease of testing.
     def get_form_class(self):
         """
         Returns the form class to use in this view.  
 
-        Field selection logic matches that of standard CreateView, except that:
-
-        * if :attr:`fields` attribute is empty, it will create the ModelForm 
-        using a list of all fields on the model, excluding any specified in the 
-        :attr:`exclude_fields` attribute. **NOTE**: This will sort fields 
-        alphabetically.  To specify field order, use the :attr:`fields` class
-        attribute instead.
-
-        * any view class or instance attributes matching keyword args to 
+        Field selection logic matches that of standard CreateView, except that 
+        any view class or instance attributes matching keyword args to 
         :func:`modelform_factory()` will be passed into the factory, permitting the 
         developer to set labels, help_text, etc. simply by subclassing the view and 
         setting the appropriate class attributes.  The exception is the 
         :attr:`exclude` keyword argument; but the :attr:`exclude_fields` attribute
         has the same effect.
+        
+        For a list of available keys and their types, see the 
+        `Django documentation <https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#modelforms-factory`_.
         """
         if self.form_class:
             return self.form_class
@@ -55,25 +52,23 @@ class RichFormFactoryCreateView(CreateView):
             # from that
             model = self.get_queryset().model
             
-        if self.fields is None:
-            # _meta.get_all_field_names() gives us the fields for the form
-            # but in the wrong order.
-            fields = model._meta.get_all_field_names()
-            
-            if getattr(self, 'exclude_fields', None):
-                # we could do this with set conversions, but it screws up field
-                # order.
-                fields = [f for f in fields if f not in self.exclude_fields]
-        else:
-            fields = copy(self.fields)
+        if not hasattr(self, 'fields') and not hasattr(self, 'exclude_fields'):
+            raise ValueError(u"Must set either fields or exclude_fields on "
+                u"RichFormFactoryCreateView subclass")
             
         kwargs = {}
         for kwarg_name in self.MODELFORM_KWARGS:
             val = getattr(self, kwarg_name, None)
-            if val:
-                kwargs[kwarg_name] = val
+            if val is not None:
+                # really, we should just rename the attribute to "exclude", but
+                # a) that name is abiguous, and b) I'm feeling lazy about
+                # updating the rest of the codebase.  May do later.
+                if kwarg_name == 'exclude_fields':
+                    kwargs['exclude'] = val
+                else:
+                    kwargs[kwarg_name] = val
 
-        return modelform_factory(model, fields=fields, **kwargs)
+        return modelform_factory(model, **kwargs)
 
 
 class AbstractFieldTracker(FieldTracker):
