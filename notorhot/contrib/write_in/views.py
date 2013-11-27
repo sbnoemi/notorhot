@@ -39,8 +39,10 @@ class WriteInBaseView(CategoryMixin, RichFormFactoryCreateView):
             # if we don't have a category, let the user choose it.
             if 'category' in self.exclude_fields:
                 self.exclude_fields.remove('category')
-                
-            if 'category' not in self.fields:
+            
+            # if we haven't listed fields out, we'll use all fields, so 
+            # don't add to an empty list
+            if self.fields and 'category' not in self.fields:
                 if 'candidate_name' in self.fields:
                     insert_index = self.fields.index('candidate_name') + 1
                     self.fields.insert(insert_index, 'category')
