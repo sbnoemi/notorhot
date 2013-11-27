@@ -98,6 +98,14 @@ class RFFCVFieldsTestCase(RFFCVTextMixin, ViewTestMixin, TestCase):
 
         form_class = self.get_form_class(View)
         self.assertEqual(form_class.base_fields.keys(), ['field3', 'field2', 'field1',])
+        
+    def test_with_empty_declared_fields(self):
+        class View(RichFormFactoryCreateView):
+            model = self.Model
+            fields = []
+
+        form_class = self.get_form_class(View)
+        self.assertEqual(form_class.base_fields.keys(), ['field3', 'field2', 'field1',])
     
     def test_with_declared_fields(self):
         class View(RichFormFactoryCreateView):
@@ -149,4 +157,3 @@ class RFFCVFieldsTestCase(RFFCVTextMixin, ViewTestMixin, TestCase):
                     'help_texts': 'help_text_dict',
                     'error_messages': 'error_message_dict',
                 })
-        

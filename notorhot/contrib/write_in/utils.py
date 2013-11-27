@@ -67,6 +67,15 @@ class RichFormFactoryCreateView(CreateView):
                     kwargs['exclude'] = val
                 else:
                     kwargs[kwarg_name] = val
+                    
+        # There's no case I can think of where you'd want to build a form with 
+        # NO fields, but in some cases we use an empty list so we don't have to 
+        # check before iterating.
+        # So we'll interpret an empty list or tuple as meaning that we should 
+        # use the default fields for the model.
+        # If you really want *no* fields, subclass and override this method.
+        if kwargs.get('fields') in ([], ()):
+            kwargs['fields'] = None
 
         return modelform_factory(model, **kwargs)
 
