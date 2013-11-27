@@ -20,6 +20,15 @@ class WriteInBaseView(CategoryMixin, RichFormFactoryCreateView):
     template_name_suffix = '_create'
     exclude_fields = ['date_submitted', 'date_processed', 'status',]
     fields = []
+    
+    def __init__(self, *args, **kwargs):
+        # if we don't copy this, then changes made in one instance apply to the 
+        # class and all instances, since fields and exclude_fields are 
+        # references rather than primitives.
+        self.fields = copy(self.fields)
+        self.exclude_fields = copy(self.exclude_fields)
+        super(WriteInBaseView, self).__init__(*args, **kwargs)
+        
             
     def get_category(self):
         return self._get_category()
@@ -62,6 +71,7 @@ class WriteInDefaultView(WriteInBaseView):
         }
     
     def __init__(self, *args, **kwargs):
+        super(WriteInDefaultView, self).__init__(*args, **kwargs)
         
         # If we're using the default model, we can specify our fields explicitly
         # if they haven't been explicitly overridden
@@ -73,8 +83,6 @@ class WriteInDefaultView(WriteInBaseView):
         # make sure we hide programmatically-populated fields
         elif getattr(self, 'exclude_fields', None) is None:
             self.exclude_fields = ['date_submitted', 'date_processed', 'status',]
-            
-        super(WriteInDefaultView, self).__init__(*args, **kwargs)
         
         
 class WriteInThanksView(CategoryMixin, TemplateView):
