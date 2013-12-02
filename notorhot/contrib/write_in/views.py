@@ -1,6 +1,6 @@
 from copy import copy
 
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render
 from django.utils.translation import ugettext as _, ugettext_lazy as _l
 from django.core.urlresolvers import reverse
@@ -87,5 +87,8 @@ class WriteInThanksView(CategoryMixin, TemplateView):
     allowed_methods = ['get',]
     
     def get_category(self):
-        return self._get_category()
+        category = self._get_category()
+        if not category:
+            raise Http404
+        return category
         

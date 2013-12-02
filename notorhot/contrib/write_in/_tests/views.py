@@ -101,5 +101,18 @@ class WriteInDefaultViewTestCase(ViewTestMixin, TestCase):
 class WriteInThanksViewTestCase(ViewTestMixin, TestCase):
     view_class = WriteInThanksView
     
-    # Not running any tests at this point, since it uses functionality already
-    # tested elsewhere.
+    def test_get_category(self):
+        cat = mixer.blend('notorhot.CandidateCategory', slug='cat1')        
+        view = self.make_view('get', request_kwargs={ 'category_slug': 'cat1', })
+
+        try:
+            view_cat = view.category
+        except Http404:
+            self.fail(u"WriteInThanksView should be able to retrieve existing "
+                "category.")
+        else:
+            self.assertEqual(cat, view_cat)
+            
+        view = self.make_view('get', request_kwargs={ 'category_slug': 'cat2', })
+        with self.assertRaises(Http404):
+            view_cat = view.category
