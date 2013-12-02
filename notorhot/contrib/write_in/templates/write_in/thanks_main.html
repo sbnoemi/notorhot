@@ -1,0 +1,10 @@
+{% load i18n %}
+
+	<h1>{% trans "Thank you!" %}</h1>
+	
+	{% include 'notorhot/new_competition.html' %}
+
+	<p>{% trans "Thank you for your suggestion.  We'll take a look and let you know if we add it to the site!" %}</p>
+	<p><a href="{% url 'write_in_submit' category_slug=category.slug %}">
+		{% blocktrans %}Suggest another option for {{ category }}{% endblocktrans %}</a></p>
+

@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^$', RedirectView.as_view(url=reverse_lazy('notorhot_categories'))),
+    url(r'^hot/write-in/', include('notorhot.contrib.write_in.urls')),
     url(r'^hot/', include('notorhot.urls')),
     url(r'^admin/', include(admin.site.urls)),
 )
