@@ -91,7 +91,15 @@ class WriteInBaseViewTestCase(ViewTestMixin, TestCase):
 class WriteInDefaultViewTestCase(ViewTestMixin, TestCase):
     view_class = WriteInDefaultView
     
+    def test_init(self):
+        view = self.make_view('get')
+        self.assertEqual(view.fields, view.default_fields)
+        self.assertEqual(view.exclude_fields, 
+            ['date_submitted', 'date_processed', 'status',])
+
 
 class WriteInThanksViewTestCase(ViewTestMixin, TestCase):
     view_class = WriteInThanksView
     
+    # Not running any tests at this point, since it uses functionality already
+    # tested elsewhere.
