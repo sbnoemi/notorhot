@@ -81,11 +81,6 @@ class WriteInDefaultView(WriteInBaseView):
                 get_write_in_model_name() == 'write_in.DefaultWriteIn':
             self.fields = self.default_fields
         
-        # and otherwise, let's assume we're using a subclass of BaseWriteIn and
-        # make sure we hide programmatically-populated fields
-        elif getattr(self, 'exclude_fields', None) is None:
-            self.exclude_fields = ['date_submitted', 'date_processed', 'status',]
-        
         
 class WriteInThanksView(CategoryMixin, TemplateView):
     template_name = 'write_in/thanks.html'
