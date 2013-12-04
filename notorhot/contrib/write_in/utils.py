@@ -35,7 +35,7 @@ class RichFormFactoryCreateView(CreateView):
         has the same effect.
         
         For a list of available keys and their types, see the 
-        `Django documentation <https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#modelforms-factory`_.
+        `Django documentation <https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#modelforms-factory>`_.
         """
         if self.form_class:
             return self.form_class
