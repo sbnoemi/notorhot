@@ -15,6 +15,30 @@ from notorhot.contrib.write_in.utils import get_write_in_model, \
 
 # Create your views here.
 class WriteInBaseView(CategoryMixin, RichFormFactoryCreateView):
+    """
+    A :class:`~django.views.edit.CreateView` subclass that can be used to record
+    write-in candidates to be stored in any model that inherits from 
+    :class:`~notorhot.contrib.write_in.WriteInBase`.  Works "out of the box" or
+    can be subclassed to hide fields for custom model classes, change the success
+    URL, or implement additional functionality.
+    
+    Inherits from 
+    :class:`~notorhot.contrib.write_in.utils.RichFormFactoryCreateView` to allow
+    for further ModelForm customization by setting additional class attributes
+    on the view.  Subclass this view and set class attributes to achieve 
+    custom form display or other custom view behavior.
+    
+    If used with a URL that passes a ``category_slug`` keyword, this view will
+    hide the "category" field from the form displayed and automatically assign
+    write-ins to the appropriate category based on the category slug in the URL.
+    
+    If used with a URL that omits the ``category_slug`` keyword, this view will
+    give the user a choice of all categories in the database to assign their 
+    write-in candidate to.
+    
+    This view permits assigning write-ins to non-public categories.
+    """
+
     allowed_methods = ['get', 'post',]
     model = get_write_in_model()
     template_name_suffix = '_create'
@@ -35,6 +59,10 @@ class WriteInBaseView(CategoryMixin, RichFormFactoryCreateView):
     
     # TODO: refactor
     def get_form_class(self):
+        """
+        Override ensures that "category" field is included or excluded from 
+        write-in form depending on whether a category was passed in the URL.
+        """
         if self.category is None:
             # if we don't have a category, let the user choose it.
             if 'category' in self.exclude_fields:
@@ -64,6 +92,15 @@ class WriteInBaseView(CategoryMixin, RichFormFactoryCreateView):
         
         
 class WriteInDefaultView(WriteInBaseView):
+    """
+    :class:`WriteInBaseView` subclass customized for use with 
+    :class:`~notorhot.contrib.write_in.models.DefaultWriteIn` as the write-in
+    storage model.
+    
+    Can also be used with any other write-in model that subclasses both
+    :class:`~notorhot.contrib.write_in.models.DefaultWriteIn` and 
+    :class:`~notorhot.contrib.write_in.models.SubmitterInfoMixin`
+    """
     default_fields = [
             'submitter_name', 'submitter_email', 'candidate_name', 'category',
         ]
@@ -83,6 +120,9 @@ class WriteInDefaultView(WriteInBaseView):
         
         
 class WriteInThanksView(CategoryMixin, TemplateView):
+    """
+    Displays a "success" page after a write-in is submitted.
+    """
     template_name = 'write_in/thanks.html'
     allowed_methods = ['get',]
     
