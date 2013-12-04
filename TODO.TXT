@@ -3,6 +3,7 @@
    * RFFCV should be a mixin, to use on EditViews too
    * Refactor RFFCV.get_form_class() for easier overrides
    * Docs
+      * new settings
 * Expire competitions after a certain date
 * Do we need any signals?  (e.g. on Competition.record_vote, competition generation)
 * Inherit templates from notorhot_base, which extends base; wrap blocks in parent blocks

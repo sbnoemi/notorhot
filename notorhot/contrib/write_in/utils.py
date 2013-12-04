@@ -8,15 +8,43 @@ from django.forms.models import modelform_factory
 from model_utils import FieldTracker
 
 def get_write_in_model_name():
+    """
+    Retrieves the name of the model (in form "appname.ModelName") defined in 
+    ``settings.NOTORHOT_SETTINGS['WRITE_IN_MODEL']``, to be used to store 
+    write-in submissions.  
+    
+    If the setting has not been defined, defaults to 
+    ``"write_in.DefaultWriteIn"``.  
+    
+    This allows for developers to specify an alternative model for write-in 
+    storage.
+    
+    :returns: write-in storage model name in form "appname.ModelName"
+    :rtype: string
+    """
     notorhot_settings = getattr(settings, 'NOTORHOT_SETTINGS', {})
     return notorhot_settings.get('WRITE_IN_MODEL', 'write_in.DefaultWriteIn')
 
 def get_write_in_model():
+    """
+    Retrieves the model class (specified in 
+    ``settings.NOTORHOT_SETTINGS['WRITE_IN_MODEL']``) to be used to store 
+    write-in submissions.  See :func:`get_write_in_model_name` for details
+    
+    :returns: write-in storage model class (**not** an instance)
+    :rtype: :class:`django.db.models.Model` 
+    """
     model_name = get_write_in_model_name()
     return get_model(*model_name.split('.'))
     
 
 class RichFormFactoryCreateView(CreateView):
+    """
+    Subclass of :class:`~django.views.generic.edit.CreateView` that allows
+    the developer to specify more arguments to 
+    :func:`~django.forms.models.modelform_factory` in order to further
+    customize the form generated.
+    """
     MODELFORM_KWARGS = ['form', 'formfield_callback', 'widgets', 
         'localized_fields', 'labels', 'help_texts', 'error_messages',
         'fields', 'exclude_fields']
@@ -36,6 +64,9 @@ class RichFormFactoryCreateView(CreateView):
         
         For a list of available keys and their types, see the 
         `Django documentation <https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#modelforms-factory>`_.
+        
+        :returns: form class (**not** an instance) to use for view
+        :rtype: :class:`django.forms.models.ModelForm`
         """
         if self.form_class:
             return self.form_class
@@ -81,10 +112,39 @@ class RichFormFactoryCreateView(CreateView):
 
 
 class AbstractFieldTracker(FieldTracker):
+    """
+    Subclass of django-model-utils :class:`model_utils.FieldTracker` that can be
+    added to abstract models and will apply properly to concrete children of
+    those models.
+    
+    This FieldTracker must be applied in the abstract model's ``.__init__()``
+    method, as a workaround to a shortcoming of Django's model inheritance. 
+    
+    See
+    `this pull request <https://github.com/carljm/django-model-utils/pull/80>`_
+    for details on the model inheritance problem.
+    
+    See source of :class:`~notorhot.contrib.write_in.models.WriteInBase` for a 
+    usage example.
+    """
+    
     def finalize_class(self, sender, name, **kwargs):
+        """
+        Should be called from the ``.__init__()`` method of the abstract model
+        to which this tracker is added. 
+        
+        Sets some instance variables that for a non-abstract model would have
+        been set during ``.contribute_to_class()``, then calls parent method to
+        properly add tracker to the ``sender`` class.
+        
+        :param sender: Class to which the tracker should be attached
+        :type sender: :class:`django.db.models.Model`
+        :param string name: the attribute name that should be used for the
+            tracker on the class that it is being attached to.  For instance, if
+            you call ``some_tracker.finalize_class(MyModel, 'myattr')``, then
+            later ``MyModel.myattr`` will return ``some_tracker``.
+        """
         self.name = name
         self.attname = '_%s' % name
         if not hasattr(sender, name):
             super(AbstractFieldTracker, self).finalize_class(sender, **kwargs)
-
-    
