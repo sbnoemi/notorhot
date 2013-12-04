@@ -241,15 +241,7 @@ class CompetitionGeneratingManager(CompetitionManager):
             ``queryset`` contains candidates from multiple categories
         :returns: new :class:`Competition` between two :class:`Candidate` 
             instances selected at random from ``queryset``
-        :rtype: :class:`Competition`
-        
-        .. warning::
-            If passed a queryset containing :class:`Candidate` instances
-            belonging to multiple :class:`Categories <CandidateCategory>`, 
-            this method is liable to generate a :class:`Competition` between 
-            :class:`Candidates <Candidate>` belonging to different categories, 
-            which is technically in violation of our business constraints.  No 
-            validation currently exists to prevent this case.            
+        :rtype: :class:`Competition`         
         """
         # Make sure our queryset only contains Candidates from a single Category
         # Because .values(), .order_by(), and .distinct() can interfere with one
