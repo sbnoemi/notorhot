@@ -47,3 +47,9 @@ django-notorhot requires:
 * `django-autoslug <https://pypi.python.org/pypi/django-autoslug>`_
 
 Additionally, `South <https://pypi.python.org/pypi/South/>`_ is recommended but not required.
+
+
+Documentation
+=============
+
+Documentation can be built using `Sphinx <http://sphinx-doc.org/>`_.  Please note that there is a bug in Sphinx Autodoc in v1.1 that prevents members of some classes (notably, :class:`~notorhot.contrib.write_in.AbstractFieldTracker`) from being displayed in the documentation.  This bug appears to be fixed in Sphinx v1.2, but as of this writing, Sphinx v1.2 is still in beta.
