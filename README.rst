@@ -28,7 +28,7 @@ Include django-notorhot's URLs in urls.py::
 
    urlpatterns = patterns('',
       ...
-      url(r'not-or-hot',  include('notorhot.urls')),
+      url(r'^not-or-hot/',  include('notorhot.urls')),
       ...
    )
    
