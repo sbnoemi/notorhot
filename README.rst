@@ -9,7 +9,7 @@ Installation
 
 We'll package this and release it to PyPi eventually, but for now, use::
 
-   pip install -e git+https://sbnoemi@github.com/sbnoemi/notorhot.git@master#egg=django-notorhot
+   pip install -e git+https://github.com/sbnoemi/notorhot.git@master#egg=django-notorhot
 
 Configuration
 =============
